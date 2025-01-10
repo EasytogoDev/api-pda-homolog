@@ -24,7 +24,7 @@ const httpsServer = https.createServer(sslOptions, app);
  */
 // Iniciar o servidor HTTP (independente)
 httpServer.listen(portHttp, () => {
-  console.log(`Servidor HTTP rodando em http://itatiba.rainhadassete.com.br:${portHttp}`);
+  console.log(`Servidor HTTP rodando em https://localhost:${portHttp}`);
 });
 
 /* // Iniciar o servidor HTTPS (independente)
