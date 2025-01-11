@@ -17,7 +17,7 @@ const swaggerOptions = {
     },
     servers: [
 	  	  {
-        url: `https://apisistema.gruporainha.com:8095`
+        url: `http://apisistema.gruporainha.com:8095`
       },
     ],
     components: {
