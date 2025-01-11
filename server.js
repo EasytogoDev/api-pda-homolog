@@ -12,7 +12,6 @@ const portHttps = process.env.PORT_SSL || 8443; // Porta para HTTPS
 const sslOptions = {
     key: fs.readFileSync('/home/artur/conf/web/api.sistema.gruporainha.com.br/ssl/api.sistema.gruporainha.com.br.key'),
     cert: fs.readFileSync('/home/artur/conf/web/api.sistema.gruporainha.com.br/ssl/api.sistema.gruporainha.com.br.pem'),
-    ca: fs.readFileSync('/home/artur/conf/web/api.sistema.gruporainha.com.br/ssl/api.sistema.gruporainha.com.br.chain.pem') // Opcional, se necessário
 };
 
 // Servidor HTTP
