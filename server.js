@@ -6,7 +6,7 @@ const app = require('./src/app');
 
 // Portas do .env
 const portHttp = process.env.PORT || 8095; // Porta para HTTP
-const portHttps = process.env.PORT_SSL || 8443; // Porta para HTTPS
+const portHttps = process.env.PORT_SSL || 8444; // Porta para HTTPS
 
 // Caminhos para os arquivos do certificado SSL no VPS
 const sslOptions = {
