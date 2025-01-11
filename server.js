@@ -26,6 +26,6 @@ httpServer.listen(portHttp, () => {
 });
 
 // Iniciar o servidor HTTPS
-httpsServer.listen(portHttp, () => {
+httpServer.listen(portHttp, () => {
     console.log(`Servidor HTTPS rodando em https://localhost:${portHttps}`);
 });
