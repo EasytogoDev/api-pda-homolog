@@ -17,13 +17,13 @@ const swaggerOptions = {
     },
     servers: [
 	  	  {
-        url: `http://itatiba.rainhadassete.com.br:8095`
+        url: `https://apisistema.gruporainha.com.br`
       },
     ],
     components: {
       securitySchemes: {
         bearerAuth: {
-          type: "http",
+          type: "https",
           scheme: "bearer",
           bearerFormat: "JWT",
         },
