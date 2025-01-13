@@ -152,6 +152,8 @@ exports.getAll = async (req, res, next) => {
   }
 };
 
+
+
 exports.getFornecedores = async (req, res, next) => {
   const limit = parseInt(req.query.limit) || 10;
   const offset = parseInt(req.query.offset) || 0;
