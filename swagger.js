@@ -16,11 +16,13 @@ const swaggerOptions = {
       description: "Sistema ERP Interno",
     },
     servers: [
-	  	  {
-        url: `https://apisistema.gruporainha.com.br`
-        // url: `http://itatiba.rainhadassete.com.br:8095`
-      },
-    ],
+	  {
+	    url: `https://apisistema.gruporainha.com.br`,
+	  },
+	  {
+	    url: `http://itatiba.rainhadassete.com.br:8095`,
+	  },
+	],
     components: {
       securitySchemes: {
         bearerAuth: {
