@@ -122,68 +122,6 @@ const login = require("../middleware/login"); // Presumindo que você tenha um m
 
 /**
  * @swagger
- * /api/itens-propostas:
- *   get:
- *     summary: Buscar todos os itens de proposta
- *     tags: [ItensProposta]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Lista de itens de proposta
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   codigoITEMPROPOSTA:
- *                     type: integer
- *                   propostaITEMPROPOSTA:
- *                     type: integer
- *                   produtoITEMPROPOSTA:
- *                     type: integer
- *                   quantidadeITEMPROPOSTA:
- *                     type: number
- *                     format: decimal
- *                   valorITEMPROPOSTA:
- *                     type: number
- *                     format: decimal
- *                   brutoITEMPROPOSTA:
- *                     type: number
- *                     format: decimal
- *                   statusITEMPROPOSTA:
- *                     type: integer
- *                   basecalculoicmsITEMPROPOSTA:
- *                     type: number
- *                     format: decimal
- *                   basecalculoicmstotalITEMPROPOSTA:
- *                     type: number
- *                     format: decimal
- *                   basecalculoicmsstITEMPROPOSTA:
- *                     type: number
- *                     format: decimal
- *                   basecalculofcpsttotalITEMPROPOSTA:
- *                     type: number
- *                     format: decimal
- *                   basecalculofcptotalITEMPROPOSTA:
- *                     type: number
- *                     format: decimal
- *       500:
- *         description: Erro ao buscar itens de proposta
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Erro ao buscar itens de proposta"
- */
-
-/**
- * @swagger
  * /api/itens-propostas/{id}:
  *   get:
  *     summary: Buscar um item de proposta por ID
@@ -414,8 +352,6 @@ const login = require("../middleware/login"); // Presumindo que você tenha um m
 // Criar um novo item de proposta
 router.post("/", login.required, itensPropostaController.create);
 
-// Buscar todos os itens de proposta
-router.get("/", login.required, itensPropostaController.findAll);
 
 // Buscar um item de proposta por ID
 router.get("/:id", login.required, itensPropostaController.findOne);

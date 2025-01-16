@@ -18,25 +18,17 @@ exports.create = async (req, res) => {
   }
 };
 
-// Buscar todos os itens de proposta
-exports.findAll = async (req, res) => {
-  try {
-    const itensProposta = await ItensProposta.findAll();
-    res.status(200).json({ status: true, itensProposta });
-  } catch (error) {
-    res.status(500).json({
-      status: false,
-      message: "Erro ao buscar itens de proposta",
-      error: error.message,
-    });
-  }
-};
+
 
 // Buscar um item de proposta por ID
 exports.findOne = async (req, res) => {
   const { id } = req.params;
   try {
-    const itemProposta = await ItensProposta.findByPk(id);
+    const itemProposta = await ItensProposta.findAll({
+      where: {
+        propostaITEMPROPOSTA: id
+      }
+    });
     if (!itemProposta) {
       return res
         .status(404)
