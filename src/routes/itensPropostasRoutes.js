@@ -352,7 +352,6 @@ const login = require("../middleware/login"); // Presumindo que você tenha um m
 // Criar um novo item de proposta
 router.post("/", login.required, itensPropostaController.create);
 
-
 // Buscar um item de proposta por ID
 router.get("/:id", login.required, itensPropostaController.findOne);
 
