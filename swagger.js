@@ -19,9 +19,6 @@ const swaggerOptions = {
 	  {
 	    url: `https://apisistema.gruporainha.com.br`,
 	  },
-	  {
-	    url: `http://itatiba.rainhadassete.com.br:8095`,
-	  },
 	],
     components: {
       securitySchemes: {
