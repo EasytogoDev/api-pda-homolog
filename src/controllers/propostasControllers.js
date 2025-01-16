@@ -103,7 +103,7 @@ exports.findAll = async (req, res) => {
 
   try {
     const propostas = await Propostas.findAll({
-      where: wms ? { wms: wms } : {},
+      where: wms ? { prop8PROPOSTA: wms } : {},
       limit: limit ? parseInt(limit, 10) : undefined, // Limitando o número de registros
       offset: offset ? parseInt(offset, 10) : undefined, // Definindo o ponto de partida
     });

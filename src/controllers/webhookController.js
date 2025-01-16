@@ -4,7 +4,7 @@ const {
   Producao,
   LogItemOrdemProducao,
   Temp1602LoteItensWms,
-  Temp1202NFItensWms
+  Temp1202NFItensWms,
 } = require("../models");
 const { sqlServerSequelize, sqlServerKnex } = require("../config/sqlserver");
 const { QueryTypes } = require("sequelize");
@@ -26,7 +26,6 @@ exports.webhookVendas = async (req, res) => {
     console.log("-----WEBHOOK VENDAS");
     console.log(req.body);
 
-    // Criar entrada na tabela Temp1601RetornoWms
     const createRetornoProposta = await Temp1601RetornoWms.create({
       codigoPROPOSTA: proposta,
       wmsPROPOSTA: statuswms,
@@ -39,17 +38,14 @@ exports.webhookVendas = async (req, res) => {
       return res.status(500).json({ erro: "Erro ao criar a proposta." });
     }
 
-    // Processar os itens da proposta
     for (const item of itens) {
       const { codigoItem, produtoItem, statusItem, lotes } = item;
 
-      // Calcular a soma de quantidade dos lotes
       const totalQuantidadeLotes = lotes.reduce(
         (sum, lote) => sum + lote.quantidadeItem,
         0
       );
 
-      // Criar entrada na tabela Temp1602RetornoItensWms
       const createRetornoItem = await Temp1602RetornoItensWms.create({
         codigoITEMPROPOSTA: codigoItem,
         produtoITEMPROPOSTA: produtoItem,
@@ -67,7 +63,6 @@ exports.webhookVendas = async (req, res) => {
           .json({ erro: "Erro ao criar os itens da proposta." });
       }
 
-      // Processar e inserir os lotes na tabela Temp1602LoteItensWms
       for (const lote of lotes) {
         const { lote: nomeLote, quantidadeItem: quantidadeLote } = lote;
 
@@ -87,7 +82,6 @@ exports.webhookVendas = async (req, res) => {
       }
     }
 
-    // Executar procedure no banco de dados
     const execProcedure = await sqlServerSequelize.query(
       "EXEC spr1601_Retorno_Wms @PROPOSTA = :proposta, @USUARIO = :usuario",
       {
@@ -121,7 +115,6 @@ exports.webhookCompras = async (req, res) => {
         quantidade: quantidadeNFITEM,
       } = item;
 
-      // Inserir dados na tabela temp1202_NF_Itens_Wms
       const createItem = await Temp1202NFItensWms.create({
         chaveNFITEM: chavenf,
         itemNFITEM,
@@ -139,7 +132,6 @@ exports.webhookCompras = async (req, res) => {
       }
     }
 
-    // Verificar status e retornar mensagem correspondente
     if (wms === 2) {
       return res.status(201).json({ message: "Compra encerrada está ok!" });
     } else if (wms === 3) {
@@ -152,22 +144,6 @@ exports.webhookCompras = async (req, res) => {
     return res.status(500).json({ "Erro no webhook:": error.message });
   }
 };
-
-/*
-{
-  "chaveNF": "35160608100049000128550010000007011030014867",
-  "wms": 2, 
-  "itens": [
-    {
-      "item": 211311564,
-      "Numeroitem": 211311564,
-      "sku": "7809 R",
-      "quantidade": 10,
-      "wms": 0
-    }
-  ]
-}
-*/
 
 exports.webhookOP = async (req, res) => {
   try {
@@ -251,13 +227,9 @@ exports.webhookOP = async (req, res) => {
         console.log(error);
         return res.status(500).send(error);
       }
-
-      //temos que criar uma op e mover a op criada para uma pasta  4592
     }
 
     if (wms === 4) {
-      //4 Recusada || Vamos criar uma pasta 4593 de RECUSADAS move essa op pra pasta e não faz nada
-
       try {
         const criarHistorico = await LogItemOrdemProducao.create({
           codigoLOGITEMOP: op,
