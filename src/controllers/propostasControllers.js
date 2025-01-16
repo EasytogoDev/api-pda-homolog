@@ -99,12 +99,15 @@ exports.create = async (req, res) => {
 
 // Buscar todas as propostas
 exports.findAll = async (req, res) => {
-  const wms = req.query.wms;
+  const { wms, limit, offset } = req.query; // Obtendo os parâmetros de consulta
 
   try {
     const propostas = await Propostas.findAll({
       where: wms ? { wms: wms } : {},
+      limit: limit ? parseInt(limit, 10) : undefined, // Limitando o número de registros
+      offset: offset ? parseInt(offset, 10) : undefined, // Definindo o ponto de partida
     });
+
     const propostasAjustadas = propostas.map((proposta) => {
       const novaProposta = {};
       Object.keys(proposta.dataValues).forEach((key) => {
@@ -127,6 +130,7 @@ exports.findAll = async (req, res) => {
     });
   }
 };
+
 
 // Buscar uma proposta por ID
 exports.findOne = async (req, res) => {

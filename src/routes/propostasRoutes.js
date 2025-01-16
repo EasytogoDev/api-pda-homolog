@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const propostasControllers = require("../controllers/propostasControllers");
-const login = require("../middleware/login"); // Presumindo que você tenha um middleware de autenticação
+const login = require("../middleware/login"); // Middleware de autenticação
 
 /**
  * @swagger
@@ -16,6 +16,8 @@ const login = require("../middleware/login"); // Presumindo que você tenha um m
  *   post:
  *     summary: Criar uma nova proposta
  *     tags: [Propostas]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -39,19 +41,6 @@ const login = require("../middleware/login"); // Presumindo que você tenha um m
  *     responses:
  *       201:
  *         description: Proposta criada com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: Proposta criada com sucesso!
- *                 proposta:
- *                   type: object
  *       500:
  *         description: Erro ao criar proposta
  */
@@ -63,15 +52,30 @@ router.post("/create", login.required, propostasControllers.create);
  *   get:
  *     summary: Buscar todas as propostas
  *     tags: [Propostas]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: wms
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Filtro por código WMS
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: Limite de registros retornados
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: Quantidade de registros a serem ignorados
  *     responses:
  *       200:
- *         description: Lista de propostas
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
+ *         description: Lista de propostas retornadas
  *       500:
  *         description: Erro ao buscar propostas
  */
@@ -83,6 +87,8 @@ router.get("/all", login.required, propostasControllers.findAll);
  *   get:
  *     summary: Buscar uma proposta por ID
  *     tags: [Propostas]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -92,13 +98,11 @@ router.get("/all", login.required, propostasControllers.findAll);
  *         description: ID da proposta
  *     responses:
  *       200:
- *         description: Proposta encontrada com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
+ *         description: Proposta encontrada
  *       404:
  *         description: Proposta não encontrada
+ *       500:
+ *         description: Erro ao buscar proposta
  */
 router.get("/get/:id", login.required, propostasControllers.findOne);
 
@@ -108,6 +112,8 @@ router.get("/get/:id", login.required, propostasControllers.findOne);
  *   put:
  *     summary: Atualizar uma proposta por ID
  *     tags: [Propostas]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -124,29 +130,16 @@ router.get("/get/:id", login.required, propostasControllers.findOne);
  *             properties:
  *               valorTotal:
  *                 type: number
- *                 description: Valor total atualizado da proposta
+ *                 description: Novo valor total
  *               descricao:
  *                 type: string
- *                 description: Descrição da proposta
+ *                 description: Descrição atualizada
  *             example:
  *               valorTotal: 6000.00
- *               descricao: "Proposta de serviços de TI atualizada"
+ *               descricao: "Proposta atualizada"
  *     responses:
  *       200:
  *         description: Proposta atualizada com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: Proposta atualizada com sucesso!
- *                 proposta:
- *                   type: object
  *       404:
  *         description: Proposta não encontrada
  *       500:
@@ -160,6 +153,8 @@ router.put("/edit/:id", login.required, propostasControllers.update);
  *   delete:
  *     summary: Deletar uma proposta por ID
  *     tags: [Propostas]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -170,17 +165,6 @@ router.put("/edit/:id", login.required, propostasControllers.update);
  *     responses:
  *       200:
  *         description: Proposta deletada com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: Proposta deletada com sucesso!
  *       404:
  *         description: Proposta não encontrada
  *       500:
@@ -192,67 +176,16 @@ router.delete("/delete/:id", login.required, propostasControllers.delete);
  * @swagger
  * /api/propostas/grouped:
  *   get:
- *     summary: Retorna as propostas agrupadas com valores agregados
+ *     summary: Obter propostas agrupadas com valores agregados
  *     tags: [Propostas]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Sucesso na busca das propostas agrupadas
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   codigoPROPOSTA:
- *                     type: integer
- *                     description: Código da proposta ou proposta vinculada
- *                     example: 123
- *                   statusPROPOSTA:
- *                     type: integer
- *                     description: Status da proposta
- *                     example: 1
- *                   liquido:
- *                     type: number
- *                     format: float
- *                     description: Soma do valor líquido das propostas
- *                     example: 1000.50
- *                   ipi:
- *                     type: number
- *                     format: float
- *                     description: Soma do valor de IPI das propostas
- *                     example: 150.75
- *                   icmsst:
- *                     type: number
- *                     format: float
- *                     description: Soma do valor de ICMS-ST das propostas
- *                     example: 200.30
- *                   bruto:
- *                     type: number
- *                     format: float
- *                     description: Soma do valor bruto das propostas
- *                     example: 1200.80
- *                   datacriacao:
- *                     type: string
- *                     format: date-time
- *                     description: Data de criação da proposta
- *                     example: "2023-09-15T12:00:00Z"
- *                   cidadeEMPRESA:
- *                     type: string
- *                     description: Nome da cidade da empresa associada
- *                     example: "São Paulo"
- *                   estadoEMPRESA:
- *                     type: string
- *                     description: Estado da empresa associada
- *                     example: "SP"
- *       401:
- *         description: Acesso negado. Autenticação necessária
+ *         description: Sucesso ao buscar propostas agrupadas
  *       500:
  *         description: Erro no servidor
  */
-
 router.get(
   "/grouped",
   login.required,
