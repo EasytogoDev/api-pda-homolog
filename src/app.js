@@ -31,6 +31,7 @@ const empresasRoutes = require("./routes/empresasRoutes");
 const fiscalRoutes = require("./routes/fiscal");
 const opsRoutes = require("./routes/opsRoutes");
 const produtosRoutes = require("./routes/produtosRoutes");
+const embalagensRoutes = require("./routes/embalagensRoutes");
 
 const bodyParser = require("body-parser");
 
@@ -71,6 +72,7 @@ app.use("/api/empresas", empresasRoutes);
 app.use("/api/fiscal", fiscalRoutes);
 app.use("/api/ops", opsRoutes);
 app.use("/api/produtos", produtosRoutes);
+app.use("/api/embalagens", embalagensRoutes);
 
 // Quando não encontra rota, entra aqui:
 app.use((req, res, next) => {

@@ -3,7 +3,6 @@ const router = express.Router();
 const produtosController = require("../controllers/produtosController");
 const login = require("../middleware/login");
 
-
 /**
  * @swagger
  * tags:
@@ -177,9 +176,8 @@ const login = require("../middleware/login");
  *         description: Erro ao buscar dados do produto
  */
 
-
-
 router.get("/", login.required, produtosController.getProdutoData);
+router.get("/comparar", login.required, produtosController.compararProdutos);
 
 router.get("/:produto", login.required, produtosController.getProdutoDataById);
 

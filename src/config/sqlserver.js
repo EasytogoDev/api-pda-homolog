@@ -28,4 +28,14 @@ const sqlServerKnex = require("knex")({
   },
 });
 
-module.exports = { sqlServerSequelize, sqlServerKnex };
+const sqlServerKnexSP = require("knex")({
+  client: "mssql",
+  connection: {
+    host: 'rainha7.ddns.com.br',
+    user: 'SA',
+    password: '@ReesdhirSAeesdhir', 
+    database: 'ENGINE',
+  },
+});
+
+module.exports = { sqlServerSequelize, sqlServerKnex, sqlServerKnexSP };

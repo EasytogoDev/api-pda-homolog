@@ -1,4 +1,4 @@
-const { sqlServerKnex } = require("../config/sqlserver");
+const { sqlServerKnex, sqlServerKnexSP } = require("../config/sqlserver");
 
 const getProdutoData = async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
@@ -84,7 +84,7 @@ const getProdutoData = async (req, res) => {
 };
 
 const getProdutoDataById = async (req, res) => {
-  const {produto} = req.params;
+  const { produto } = req.params;
 
   if (!produto) {
     return res.status(500).send({ mensagem: "Error" });
@@ -165,4 +165,50 @@ const getProdutoDataById = async (req, res) => {
   }
 };
 
-module.exports = { getProdutoData, getProdutoDataById };
+const compararProdutos = async (req, res) => {
+  try {
+    // Query para buscar todos os produtos
+    const query = `SELECT partnumberPRODUTO FROM tb0501_Produtos WHERE descontinuadoPRODUTO = 0 AND lixeiraPRODUTO = 0`;
+
+    // Executar a query em ambas as bases
+    const produtosItatiba = await sqlServerKnex.raw(query);
+    const produtosSP = await sqlServerKnexSP.raw(query);
+
+    // Garantir que codigosItatiba seja um Set
+    const codigosItatiba = new Set(
+      produtosItatiba.map((produto) => produto.partnumberPRODUTO.trim())
+    );
+
+    // Transformar os códigos da base SP em um array de strings
+    const codigosSP = produtosSP.map((produto) => produto.partnumberPRODUTO.trim());
+
+    // Arrays para os resultados
+    const itens = [];
+    const fora = [];
+
+    // Comparar usando o Set para eficiência
+    for (let codigoSP of codigosSP) {
+      if (codigosItatiba.has(codigoSP)) {
+        itens.push(codigoSP); // Está em ambas as bases
+      } else {
+        fora.push(codigoSP); // Está apenas na base SP
+      }
+    }
+
+    return res.status(200).send({
+      mensagem: "Comparação concluída.",
+      itensEncontrados: itens.length,
+      itensFora: fora.length,
+      fora,
+    });
+  } catch (error) {
+    console.error("Erro ao comparar produtos:", error);
+    return res.status(500).send({
+      mensagem: "Erro interno ao comparar produtos.",
+      error,
+    });
+  }
+};
+
+
+module.exports = { getProdutoData, getProdutoDataById, compararProdutos };

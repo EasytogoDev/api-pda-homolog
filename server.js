@@ -9,16 +9,16 @@ const portHttp = process.env.PORT || 8095; // Porta para HTTP
 const portHttps = process.env.PORT_SSL || 8444; // Porta para HTTPS
 
 // Caminhos para os arquivos do certificado SSL no VPS
-const sslOptions = {
-    key: fs.readFileSync('/home/artur/conf/web/api.sistema.gruporainha.com.br/ssl/api.sistema.gruporainha.com.br.key'),
-    cert: fs.readFileSync('/home/artur/conf/web/api.sistema.gruporainha.com.br/ssl/api.sistema.gruporainha.com.br.pem'),
-};
+// const sslOptions = {
+//     key: fs.readFileSync('/home/artur/conf/web/api.sistema.gruporainha.com.br/ssl/api.sistema.gruporainha.com.br.key'),
+//     cert: fs.readFileSync('/home/artur/conf/web/api.sistema.gruporainha.com.br/ssl/api.sistema.gruporainha.com.br.pem'),
+// };
 
 // Servidor HTTP
 const httpServer = http.createServer(app);
 
 // Servidor HTTPS
-const httpsServer = https.createServer(sslOptions, app);
+// const httpsServer = https.createServer(sslOptions, app);
 
 // Iniciar o servidor HTTP
 httpServer.listen(portHttp, () => {
@@ -26,6 +26,6 @@ httpServer.listen(portHttp, () => {
 });
 
 // Iniciar o servidor HTTPS
-httpsServer.listen(portHttps, () => {
-    console.log(`Servidor HTTPS rodando em https://localhost:${portHttps}`);
-});
+// httpsServer.listen(portHttps, () => {
+//     console.log(`Servidor HTTPS rodando em https://localhost:${portHttps}`);
+// });

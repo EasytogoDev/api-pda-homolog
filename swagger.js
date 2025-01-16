@@ -11,19 +11,21 @@ const swaggerOptions = {
   swaggerDefinition: {
     openapi: "3.0.0",
     info: {
-      title: "API RAINHA DAS SETE",
+      title: "API RAINHA DAS SETE - PDA",
       version: "1.0.0",
       description: "Sistema ERP Interno",
     },
     servers: [
 	  	  {
-        url: `https://apisistema.gruporainha.com.br`
+        // url: `https://apisistema.gruporainha.com.br`
+        url: `http://itatiba.rainhadassete.com.br:8095`
       },
     ],
     components: {
       securitySchemes: {
         bearerAuth: {
-          type: "https",
+          // type: "https",
+          type: "http",
           scheme: "bearer",
           bearerFormat: "JWT",
         },

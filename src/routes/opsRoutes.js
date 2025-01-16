@@ -85,13 +85,53 @@ const login = require("../middleware/login"); // Middleware de autenticação
  *                     type: integer
  *                     description: Status da produção (1 = Gerada, 2 = Produzindo, 3 = Encerrada).
  *                     example: 2
+ *                   WMS:
+ *                     type: integer
+ *                     description: Indicador WMS da produção.
+ *                     example: 1
  *       '400':
  *         description: Parâmetros inválidos fornecidos.
  *       '401':
  *         description: Falha na autenticação (Token inválido ou ausente).
  *       '500':
  *         description: Erro interno do servidor.
+ *
+ * /api/ops/alterar-status/{codigo}:
+ *   post:
+ *     summary: Alterar status do WMS para 1
+ *     description: Atualiza o status do WMS da OP para 1, se aplicável, e retorna mensagens específicas dependendo do estado atual.
+ *     tags:
+ *       - Produção
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: codigo
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Código da produção a ser atualizada.
+ *     responses:
+ *       '200':
+ *         description: Status alterado com sucesso ou mensagem específica do estado atual da OP.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   description: Indica se a alteração foi bem-sucedida.
+ *                   example: true
+ *                 mensagem:
+ *                   type: string
+ *                   description: Mensagem sobre o estado da OP.
+ *                   example: "OP 12345 processado no estoque!"
+ *       '500':
+ *         description: Erro interno do servidor.
  */
-router.get("/", login.required, opsController.getProducaoData);
+
+router.get("/", opsController.getProducaoData);
+router.post("/alterar-status/:codigo", opsController.alterarStatusWMSPara1);
 
 module.exports = router;

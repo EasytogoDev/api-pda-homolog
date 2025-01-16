@@ -173,9 +173,6 @@ exports.webhookOP = async (req, res) => {
   try {
     const { op, quantidadeColetada, wms } = req.body;
 
-    console.log("-----WEBHOOK OP");
-    console.log(req.body);
-
     const usuario = await this.getUserByToken(req);
 
     const quantidadeFinal = await Producao.findOne({
@@ -294,18 +291,3 @@ exports.webhookOP = async (req, res) => {
     return res.status(500).json({ "Erro no webhook:": error.message });
   }
 };
-
-// payload de OP
-// {
-//   "OP": 325052,
-//   "QuantidadeColetada": 100,
-//   "wms": 2
-// }
-
-// statusPRODUCAO 1 Novo 2 Produzindo 3 Encerrada
-// pastaPRODUCAO Vamos definir a pasta
-
-//2 esta ok ||  3 Encerrada || pegamos a OP e encerramos dando entrada no estoque e saida dos componentes
-//3 Divergente || 3 Encerrada mas cria OP da diff || 90 ele da a entrada das 90 vamos encerrar com 90 e abrir uma op da diferença no caso de 10 , e colocamos uma observação par aindicar que deu divergencia e colocamos numa pasta
-
-//Todos vamos por um historico
