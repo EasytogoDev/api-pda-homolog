@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const opsController = require("../controllers/opsController");
-const login = require("../middleware/login"); // Middleware de autenticação
 
 /**
  * @swagger
@@ -11,8 +10,6 @@ const login = require("../middleware/login"); // Middleware de autenticação
  *     description: Retorna os dados de produção com detalhes específicos, com suporte a paginação e filtros opcionais.
  *     tags:
  *       - Produção
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: limit
@@ -91,8 +88,6 @@ const login = require("../middleware/login"); // Middleware de autenticação
  *                     example: 1
  *       '400':
  *         description: Parâmetros inválidos fornecidos.
- *       '401':
- *         description: Falha na autenticação (Token inválido ou ausente).
  *       '500':
  *         description: Erro interno do servidor.
  *
@@ -102,8 +97,6 @@ const login = require("../middleware/login"); // Middleware de autenticação
  *     description: Atualiza o status do WMS da OP para 1, se aplicável, e retorna mensagens específicas dependendo do estado atual.
  *     tags:
  *       - Produção
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: codigo
