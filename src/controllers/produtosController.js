@@ -45,7 +45,6 @@ const getProdutoData = async (req, res) => {
           LEFT JOIN tb0545_Embalagens ON codigoEMBALAGEM = embalagemEMBALAGEMPRODUTO
           WHERE lixeiraPRODUTO = 0 
             AND descontinuadoPRODUTO = 0 
-            AND descontinuarPRODUTO = 0
             AND obtencaoPRODUTO IN(1,2)
             AND tipoPRODUTO = 1
           GROUP BY 
@@ -129,7 +128,6 @@ const getProdutoDataById = async (req, res) => {
           LEFT JOIN tb0545_Embalagens ON codigoEMBALAGEM = embalagemEMBALAGEMPRODUTO
           WHERE lixeiraPRODUTO = 0 
             AND descontinuadoPRODUTO = 0 
-            AND descontinuarPRODUTO = 0 
             AND obtencaoPRODUTO IN(1,2)
             AND tipoPRODUTO = 1
             AND partnumberPRODUTO = ?  -- Adicionando a comparação com o parâmetro 'produto'
