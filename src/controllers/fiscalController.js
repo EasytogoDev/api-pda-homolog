@@ -64,29 +64,27 @@ exports.buscarNotaFiscalPorCodProposta = async (req, res) => {
   try {
     const { codigo } = req.params;
     const query = `
-SELECT TOP 10
-        codigoNOTAFISCAL, codigoPROPOSTA ,chaveCHAVENFE 
+      SELECT TOP 1 
+        codigoNOTAFISCAL, codigoPROPOSTA ,chaveNFE
       FROM 
         tb1501_Notas_Fiscais
-      INNER JOIN 
+      LEFT JOIN 
         tb1602_Itens_Proposta ON codigoNOTAFISCAL = notafiscalITEMPROPOSTA
-      INNER JOIN 
+      LEFT JOIN 
         tb1601_Propostas ON propostaITEMPROPOSTA = codigoPROPOSTA
-		INNER JOIN tb1548_Chaves_NFE ON codigoNOTAFISCAL = notafiscalCHAVENFE
+		  LEFT JOIN tb1522_NFe ON codigoNOTAFISCAL = nfNFE
       WHERE 
         codigoPROPOSTA = ?
-		GROUP BY  codigoNOTAFISCAL, codigoPROPOSTA ,chaveCHAVENFE 
-	  ORDER BY codigoPROPOSTA DESC
     `;
 
     const result = await sqlServerKnex.raw(query, [codigo]);
 
-    const rows = result?.[0] ?? result; // Para alguns bancos como SQL Server
-    if (!rows || rows.length === 0) {
-      return res
-        .status(404)
-        .json({ mensagem: "Nenhuma nota fiscal encontrada." });
-    }
+    // const rows = result?.[0] ?? result; // Para alguns bancos como SQL Server
+    // if (!rows || rows.length === 0) {
+    //   return res
+    //     .status(404)
+    //     .json({ mensagem: "Nenhuma nota fiscal encontrada." });
+    // }
 
     return res.send(result);
   } catch (error) {
