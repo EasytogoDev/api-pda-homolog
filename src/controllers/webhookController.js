@@ -83,16 +83,16 @@ exports.webhookVendas = async (req, res) => {
       }
     }
 
-    // const execProcedure = await sqlServerSequelize.query(
-    //   "EXEC spr1601_Retorno_Wms @PROPOSTA = :proposta, @USUARIO = :usuario",
-    //   {
-    //     replacements: { proposta, usuario },
-    //     type: QueryTypes.SELECT,
-    //     raw: true,
-    //   }
-    // );
+    const execProcedure = await sqlServerSequelize.query(
+      "EXEC spr1601_Retorno_Wms @PROPOSTA = :proposta, @USUARIO = :usuario",
+      {
+        replacements: { proposta, usuario },
+        type: QueryTypes.SELECT,
+        raw: true,
+      }
+    );
 
-    // console.log("Procedure: ", execProcedure);
+    console.log("Procedure: ", execProcedure);
 
     return res.status(201).json({ ok: "OK" });
   } catch (error) {
