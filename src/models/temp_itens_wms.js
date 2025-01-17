@@ -8,6 +8,7 @@ const Temp1602RetornoItensWms = sqlServerSequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
+      autoIncrement: true,
     },
     produtoITEMPROPOSTA: {
       type: DataTypes.INTEGER,

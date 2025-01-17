@@ -38,8 +38,10 @@ exports.webhookVendas = async (req, res) => {
       return res.status(500).json({ erro: "Erro ao criar a proposta." });
     }
 
+
     for (const item of itens) {
-      const { codigoItem, produtoItem, statusItem, lotes } = item;
+      const { produtoItem, statusItem, lotes } = item;
+      console.log(item.lotes)
 
       const totalQuantidadeLotes = lotes.reduce(
         (sum, lote) => sum + lote.quantidadeItem,
@@ -47,7 +49,6 @@ exports.webhookVendas = async (req, res) => {
       );
 
       const createRetornoItem = await Temp1602RetornoItensWms.create({
-        codigoITEMPROPOSTA: codigoItem,
         produtoITEMPROPOSTA: produtoItem,
         propostaITEMPROPOSTA: proposta,
         quantidadeITEMPROPOSTA: totalQuantidadeLotes, // Soma dos lotes
