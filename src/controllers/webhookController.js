@@ -38,38 +38,38 @@ exports.webhookVendas = async (req, res) => {
       return res.status(500).json({ erro: "Erro ao criar a proposta." });
     }
 
-
     for (const item of itens) {
       const { produtoItem, statusItem, lotes } = item;
-      console.log(item.lotes)
-
-      const totalQuantidadeLotes = lotes.reduce(
-        (sum, lote) => sum + lote.quantidadeItem,
-        0
-      );
-
-      const createRetornoItem = await Temp1602RetornoItensWms.create({
-        produtoITEMPROPOSTA: produtoItem,
-        propostaITEMPROPOSTA: proposta,
-        quantidadeITEMPROPOSTA: totalQuantidadeLotes, // Soma dos lotes
-        statusITEMPROPOSTA: statusItem,
-        locacaoITEMPROPOSTA: "BR",
-      });
-
-      console.log(createRetornoItem);
-
-      if (!createRetornoItem) {
-        return res
-          .status(500)
-          .json({ erro: "Erro ao criar os itens da proposta." });
-      }
 
       for (const lote of lotes) {
         const { lote: nomeLote, quantidadeItem: quantidadeLote } = lote;
 
+        const totalQuantidadeLotes = lotes.reduce(
+          (sum, lote) => sum + lote.quantidadeItem,
+          0
+        );
+
+        const createRetornoItem = await Temp1602RetornoItensWms.create({
+          produtoITEMPROPOSTA: produtoItem,
+          propostaITEMPROPOSTA: proposta,
+          quantidadeITEMPROPOSTA: totalQuantidadeLotes, // Soma dos lotes
+          statusITEMPROPOSTA: statusItem,
+          locacaoITEMPROPOSTA: "BR",
+          loteITEMPROPOSTA: nomeLote,
+          nomeloteITEMPROPOSTA: nomeLote,
+        });
+
+        console.log(createRetornoItem);
+
+        if (!createRetornoItem) {
+          return res
+            .status(500)
+            .json({ erro: "Erro ao criar os itens da proposta." });
+        }
+
         const createLoteItem = await Temp1602LoteItensWms.create({
           loteLOTEITEM: nomeLote,
-          produtoLOTEITEM: codigoItem,
+          produtoLOTEITEM: produtoItem,
           quantidadeLOTEITEM: quantidadeLote,
         });
 
@@ -83,16 +83,16 @@ exports.webhookVendas = async (req, res) => {
       }
     }
 
-    const execProcedure = await sqlServerSequelize.query(
-      "EXEC spr1601_Retorno_Wms @PROPOSTA = :proposta, @USUARIO = :usuario",
-      {
-        replacements: { proposta, usuario },
-        type: QueryTypes.SELECT,
-        raw: true,
-      }
-    );
+    // const execProcedure = await sqlServerSequelize.query(
+    //   "EXEC spr1601_Retorno_Wms @PROPOSTA = :proposta, @USUARIO = :usuario",
+    //   {
+    //     replacements: { proposta, usuario },
+    //     type: QueryTypes.SELECT,
+    //     raw: true,
+    //   }
+    // );
 
-    console.log("Procedure: ", execProcedure);
+    // console.log("Procedure: ", execProcedure);
 
     return res.status(201).json({ ok: "OK" });
   } catch (error) {

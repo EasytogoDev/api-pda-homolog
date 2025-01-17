@@ -27,7 +27,7 @@ const Temp1602RetornoItensWms = sqlServerSequelize.define(
       allowNull: false,
     },
     loteITEMPROPOSTA: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(50),
       allowNull: true,
     },
     nomeloteITEMPROPOSTA: {
