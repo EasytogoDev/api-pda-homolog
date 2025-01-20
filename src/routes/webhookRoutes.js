@@ -15,7 +15,7 @@ const login = require("../middleware/login");
  * /api/retorno/vendas:
  *   post:
  *     summary: Processa uma proposta de vendas e seus itens
- *     description: Recebe informações de uma proposta de vendas, seus itens e os lotes associados, e executa uma procedure no SQL Server.
+ *     description: Recebe informações de uma proposta de vendas, seus itens e os lotes associados, cria registros temporários no banco de dados e executa uma procedure no SQL Server.
  *     tags: [Webhook]
  *     security:
  *       - bearerAuth: []
@@ -30,8 +30,8 @@ const login = require("../middleware/login");
  *               - statuswms
  *               - usuario
  *               - itens
- *               - volume
- *               - peso
+ *               - Volumes
+ *               - PesoTotalPedido
  *             properties:
  *               proposta:
  *                 type: integer
@@ -47,6 +47,7 @@ const login = require("../middleware/login");
  *                 example: 101
  *               itens:
  *                 type: array
+ *                 description: Lista de itens associados à proposta.
  *                 items:
  *                   type: object
  *                   required:
@@ -64,6 +65,7 @@ const login = require("../middleware/login");
  *                       example: 1
  *                     lotes:
  *                       type: array
+ *                       description: Lotes associados ao item.
  *                       items:
  *                         type: object
  *                         required:
@@ -94,9 +96,9 @@ const login = require("../middleware/login");
  *             schema:
  *               type: object
  *               properties:
- *                 mensagem:
+ *                 ok:
  *                   type: string
- *                   example: "Proposta processada com sucesso"
+ *                   example: "OK"
  *       500:
  *         description: Erro interno do servidor.
  *         content:
