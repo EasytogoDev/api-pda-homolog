@@ -177,6 +177,14 @@ const login = require("../middleware/login"); // Middleware de autenticação
  *                     type: string
  *                     description: Nome da transportadora.
  *                     example: "Transportadora XYZ Ltda"
+ *                   numeroNOTAFISCAL:
+ *                     type: integer
+ *                     description: Numero da nota fiscal
+ *                     example: 001
+ *                   serieNOTAFISCAL:
+ *                     type: integer
+ *                     description: Serie da nota fiscal
+ *                     example: 2
  *       '404':
  *         description: Código da proposta não encontrado.
  *       '500':

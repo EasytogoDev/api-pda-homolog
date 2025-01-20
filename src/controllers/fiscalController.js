@@ -65,7 +65,12 @@ exports.buscarNotaFiscalPorCodProposta = async (req, res) => {
     const { codigo } = req.params;
     const query = `
       SELECT TOP 1 
-        codigoNOTAFISCAL, codigoPROPOSTA ,chaveNFE, transportadoraNOTAFISCAL as TRANSPORTADORA
+        codigoNOTAFISCAL, 
+        codigoPROPOSTA,
+        chaveNFE, 
+        transportadoraNOTAFISCAL as TRANSPORTADORA, 
+        numeroNOTAFISCAL, 
+        serieNOTAFISCAL
       FROM 
         tb1501_Notas_Fiscais
       INNER JOIN 
