@@ -21,7 +21,7 @@ exports.getUserByToken = async (req) => {
 
 exports.webhookVendas = async (req, res) => {
   try {
-    const { proposta, statuswms, usuario, itens, volume, peso } = req.body;
+    const { proposta, statuswms, usuario, itens, Volumes, PesoTotalPedido } = req.body;
 
     console.log("-----WEBHOOK VENDAS");
     console.log(req.body);
@@ -30,8 +30,8 @@ exports.webhookVendas = async (req, res) => {
       codigoPROPOSTA: proposta,
       wmsPROPOSTA: statuswms,
       usuarioPROPOSTA: usuario,
-      pesoPROPOSTA: peso,
-      volumePROPOSTA: volume,
+      pesoPROPOSTA: PesoTotalPedido,
+      volumePROPOSTA: Volumes,
     });
 
     console.log({ createRetornoProposta });

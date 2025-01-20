@@ -78,11 +78,11 @@ const login = require("../middleware/login");
  *                             type: integer
  *                             description: Quantidade do item no lote.
  *                             example: 5
- *               volume:
+ *               Volumes:
  *                 type: number
  *                 description: Volume total da proposta.
  *                 example: 10
- *               peso:
+ *               PesoTotalPedido:
  *                 type: number
  *                 description: Peso total da proposta.
  *                 example: 20.3
