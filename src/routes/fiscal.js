@@ -8,7 +8,7 @@ const login = require("../middleware/login"); // Middleware de autenticação
  * /api/fiscal/:
  *   get:
  *     summary: Obter dados do pedido e informações fiscais com paginação
- *     description: Retorna os dados de um pedido específico com detalhes fiscais associados, com suporte a paginação.
+ *     description: Retorna os dados de pedidos com informações fiscais associadas, incluindo itens detalhados, com suporte a paginação.
  *     tags:
  *       - Fiscal
  *     security:
@@ -133,7 +133,6 @@ const login = require("../middleware/login"); // Middleware de autenticação
  *       '500':
  *         description: Erro interno do servidor.
  */
-router.get("/", login.required, fiscalController.getPedidoData);
 
 /**
  * @swagger
@@ -166,10 +165,6 @@ router.get("/", login.required, fiscalController.getPedidoData);
  *                     type: integer
  *                     description: Código da nota fiscal.
  *                     example: 101
- *                   codigoITEMPROPOSTA:
- *                     type: integer
- *                     description: Código do item da proposta.
- *                     example: 456
  *                   codigoPROPOSTA:
  *                     type: integer
  *                     description: Código da proposta.
@@ -178,11 +173,18 @@ router.get("/", login.required, fiscalController.getPedidoData);
  *                     type: string
  *                     description: Chave de acesso da nota fiscal.
  *                     example: "35160608100049000128550010000007011030014867"
+ *                   TRANSPORTADORA:
+ *                     type: string
+ *                     description: Nome da transportadora.
+ *                     example: "Transportadora XYZ Ltda"
  *       '404':
  *         description: Código da proposta não encontrado.
  *       '500':
  *         description: Erro interno do servidor.
  */
+
+router.get("/", login.required, fiscalController.getPedidoData);
+
 router.get(
   "/buscar-nf/:codigo",
   login.required,

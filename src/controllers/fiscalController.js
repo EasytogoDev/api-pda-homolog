@@ -65,14 +65,14 @@ exports.buscarNotaFiscalPorCodProposta = async (req, res) => {
     const { codigo } = req.params;
     const query = `
       SELECT TOP 1 
-        codigoNOTAFISCAL, codigoPROPOSTA ,chaveNFE
+        codigoNOTAFISCAL, codigoPROPOSTA ,chaveNFE, transportadoraNOTAFISCAL as TRANSPORTADORA
       FROM 
         tb1501_Notas_Fiscais
-      LEFT JOIN 
+      INNER JOIN 
         tb1602_Itens_Proposta ON codigoNOTAFISCAL = notafiscalITEMPROPOSTA
-      LEFT JOIN 
+      INNER JOIN 
         tb1601_Propostas ON propostaITEMPROPOSTA = codigoPROPOSTA
-		  LEFT JOIN tb1522_NFe ON codigoNOTAFISCAL = nfNFE
+		  INNER JOIN tb1522_NFe ON codigoNOTAFISCAL = nfNFE
       WHERE 
         codigoPROPOSTA = ?
     `;
