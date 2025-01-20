@@ -112,6 +112,7 @@ const Producao = sqlServerSequelize.define(
     wmsPRODUCAO: {
       type: DataTypes.STRING(50),
       allowNull: true,
+      defaultValue: 0,
     },
   },
   {

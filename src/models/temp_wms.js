@@ -17,6 +17,14 @@ const Temp1601RetornoWms = sqlServerSequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    pesoPROPOSTA: {
+      type: DataTypes.DECIMAL(18,8),
+      allowNull: false,
+    },
+    volumePROPOSTA: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   {
     tableName: "temp1601_Retorno_Wms",

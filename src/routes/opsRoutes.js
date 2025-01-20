@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const opsController = require("../controllers/opsController");
+const login = require("../middleware/login");
 
 /**
  * @swagger
@@ -124,7 +125,11 @@ const opsController = require("../controllers/opsController");
  *         description: Erro interno do servidor.
  */
 
-router.get("/", opsController.getProducaoData);
-router.post("/alterar-status/:codigo", opsController.alterarStatusWMSPara1);
+router.get("/", login.optional, opsController.getProducaoData);
+router.post(
+  "/alterar-status/:codigo",
+  login.optional,
+  opsController.alterarStatusWMSPara1
+);
 
 module.exports = router;

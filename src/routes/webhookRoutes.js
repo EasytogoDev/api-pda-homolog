@@ -9,6 +9,7 @@ const login = require("../middleware/login");
  *   name: Webhook
  *   description: Endpoints para processamento de vendas, compras e OP
  */
+
 /**
  * @swagger
  * /api/retorno/vendas:
@@ -29,6 +30,8 @@ const login = require("../middleware/login");
  *               - statuswms
  *               - usuario
  *               - itens
+ *               - volume
+ *               - peso
  *             properties:
  *               proposta:
  *                 type: integer
@@ -47,16 +50,10 @@ const login = require("../middleware/login");
  *                 items:
  *                   type: object
  *                   required:
- *                     - codigoItem
  *                     - produtoItem
- *                     - quantidadeItem
  *                     - statusItem
  *                     - lotes
  *                   properties:
- *                     codigoItem:
- *                       type: integer
- *                       description: Código do item.
- *                       example: 6789
  *                     produtoItem:
  *                       type: integer
  *                       description: Código do produto associado ao item.
@@ -81,6 +78,14 @@ const login = require("../middleware/login");
  *                             type: integer
  *                             description: Quantidade do item no lote.
  *                             example: 5
+ *               volume:
+ *                 type: number
+ *                 description: Volume total da proposta.
+ *                 example: 10
+ *               peso:
+ *                 type: number
+ *                 description: Peso total da proposta.
+ *                 example: 20.3
  *     responses:
  *       201:
  *         description: Proposta processada com sucesso.

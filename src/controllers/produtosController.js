@@ -23,6 +23,7 @@ const getProdutoData = async (req, res) => {
                   ELSE ean13PRODUTO 
               END AS Barras,
               nomeUNIDADEMEDIDA AS N,
+              descontinuadoPRODUTO AS Descontinuado,
               nomePASTA AS PASTA,
               (
                   SELECT 
@@ -44,7 +45,7 @@ const getProdutoData = async (req, res) => {
           LEFT JOIN tb0504_Embalagens_Produtos ON codigoPRODUTO = produtoEMBALAGEMPRODUTO AND padraoEMBALAGEMPRODUTO = 1
           LEFT JOIN tb0545_Embalagens ON codigoEMBALAGEM = embalagemEMBALAGEMPRODUTO
           WHERE lixeiraPRODUTO = 0 
-            AND descontinuadoPRODUTO = 0 
+            -- AND descontinuadoPRODUTO = 0 
             AND obtencaoPRODUTO IN(1,2)
             AND tipoPRODUTO = 1
           GROUP BY 
@@ -106,6 +107,7 @@ const getProdutoDataById = async (req, res) => {
                   ELSE ean13PRODUTO 
               END AS Barras,
               nomeUNIDADEMEDIDA AS N,
+              descontinuadoPRODUTO AS Descontinuado,
               nomePASTA AS PASTA,
               (
                   SELECT 
@@ -127,7 +129,7 @@ const getProdutoDataById = async (req, res) => {
           LEFT JOIN tb0504_Embalagens_Produtos ON codigoPRODUTO = produtoEMBALAGEMPRODUTO AND padraoEMBALAGEMPRODUTO = 1
           LEFT JOIN tb0545_Embalagens ON codigoEMBALAGEM = embalagemEMBALAGEMPRODUTO
           WHERE lixeiraPRODUTO = 0 
-            AND descontinuadoPRODUTO = 0 
+            -- AND descontinuadoPRODUTO = 0 
             AND obtencaoPRODUTO IN(1,2)
             AND tipoPRODUTO = 1
             AND partnumberPRODUTO = ?  -- Adicionando a comparação com o parâmetro 'produto'

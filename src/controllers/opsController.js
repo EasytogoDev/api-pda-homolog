@@ -49,25 +49,24 @@ const getProducaoData = async (req, res) => {
 
 const alterarStatusWMSPara1 = async (req, res) => {
   const { codigo } = req.params;
+
   try {
     const busca = `
-      SELECT *
+      SELECT wmsPRODUCAO
       FROM tb1301_Producao 
       WHERE codigoPRODUCAO = ?
     `;
 
     const resultadoBusca = await sqlServerKnex.raw(busca, [codigo]);
 
-    const status = resultadoBusca.map((result) => {
-      result.wmsPRODUCAO;
-    });
+    const status = resultadoBusca[0]?.wmsPRODUCAO;
 
-    if (status === 0) {
+    if (status === 0 || status === null) {
       const update = `
-      UPDATE tb1301_Producao 
-      SET wmsPRODUCAO
-      WHERE codigoPRODUCAO = ?
-  `;
+        UPDATE tb1301_Producao 
+        SET wmsPRODUCAO = 1
+        WHERE codigoPRODUCAO = ?
+      `;
 
       const resultadoUpdate = await sqlServerKnex.raw(update, [codigo]);
       return res.send({ status: true, resultadoUpdate });
@@ -86,10 +85,16 @@ const alterarStatusWMSPara1 = async (req, res) => {
         status: false,
         mensagem: `A OP ${codigo} já está finalizada.`,
       });
+    } else {
+      return res.send({
+        status: false,
+        mensagem: `Status desconhecido para a OP ${codigo}.`,
+      });
     }
   } catch (error) {
     return res.status(500).send(error);
   }
 };
+
 
 module.exports = { getProducaoData, alterarStatusWMSPara1 };
