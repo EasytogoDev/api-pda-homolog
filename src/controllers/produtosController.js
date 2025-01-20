@@ -60,6 +60,7 @@ const getProdutoData = async (req, res) => {
               nomeUNIDADEMEDIDA, 
               nomePASTA, 
               codigobarrasEMBALAGEMPRODUTO,
+              descontinuadoPRODUTO,
               undprincipalPRODUTO  -- Adicionado ao GROUP BY
       ) AS Result
       WHERE RowNum > ? AND RowNum <= (? + ?)
@@ -145,6 +146,7 @@ const getProdutoDataById = async (req, res) => {
               nomeUNIDADEMEDIDA, 
               nomePASTA, 
               codigobarrasEMBALAGEMPRODUTO,
+              descontinuadoPRODUTO,
               undprincipalPRODUTO  -- Adicionado ao GROUP BY
     `;
 
