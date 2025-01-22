@@ -64,22 +64,23 @@ exports.buscarNotaFiscalPorCodProposta = async (req, res) => {
   try {
     const { codigo } = req.params;
     const query = `
-      SELECT TOP 1 
-        codigoNOTAFISCAL, 
-        codigoPROPOSTA,
-        chaveNFE, 
-        transportadoraNOTAFISCAL as TRANSPORTADORA, 
-        numeroNOTAFISCAL, 
-        serieNOTAFISCAL
-      FROM 
-        tb1501_Notas_Fiscais
-      INNER JOIN 
-        tb1602_Itens_Proposta ON codigoNOTAFISCAL = notafiscalITEMPROPOSTA
-      INNER JOIN 
-        tb1601_Propostas ON propostaITEMPROPOSTA = codigoPROPOSTA
-		  INNER JOIN tb1522_NFe ON codigoNOTAFISCAL = nfNFE
-      WHERE 
-        codigoPROPOSTA = ?
+    SELECT TOP 1 
+      codigoNOTAFISCAL, 
+      codigoPROPOSTA,
+      chaveNFE, 
+      transportadoraNOTAFISCAL as TRANSPORTADORA, 
+      numeroNOTAFISCAL, 
+      serieNOTAFISCAL
+    FROM 
+      tb1501_Notas_Fiscais
+    INNER JOIN 
+      tb1602_Itens_Proposta ON numeroNOTAFISCAL = notafiscalITEMPROPOSTA
+    INNER JOIN 
+      tb1601_Propostas ON propostaITEMPROPOSTA = codigoPROPOSTA
+    INNER JOIN 
+      tb1522_NFe ON codigoNOTAFISCAL = nfNFE
+    WHERE 
+      codigoPROPOSTA = ?
     `;
 
     const result = await sqlServerKnex.raw(query, [codigo]);
