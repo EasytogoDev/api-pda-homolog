@@ -176,9 +176,127 @@ const login = require("../middleware/login");
  *         description: Erro ao buscar dados do produto
  */
 
+/**
+ * @swagger
+ * /api/produtos/comparar:
+ *   get:
+ *     summary: Compara os produtos entre as bases de dados Itatiba e SP
+ *     tags: [Produtos]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Resultado da comparação dos produtos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 mensagem:
+ *                   type: string
+ *                   description: Mensagem com o status da comparação
+ *                 itensEncontrados:
+ *                   type: integer
+ *                   description: Quantidade de itens encontrados em ambas as bases
+ *                 itensFora:
+ *                   type: integer
+ *                   description: Quantidade de itens encontrados apenas na base SP
+ *                 fora:
+ *                   type: array
+ *                   description: Lista de SKUs encontrados apenas na base SP
+ *                   items:
+ *                     type: string
+ *       500:
+ *         description: Erro interno ao comparar produtos
+ */
+
+/**
+ * @swagger
+ * /api/produtos/codigo/{produto}:
+ *   get:
+ *     summary: Obtém os dados de um produto específico pelo código interno
+ *     tags: [Produtos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: produto
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Código interno do produto a ser buscado
+ *     responses:
+ *       200:
+ *         description: Dados do produto solicitado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 codigo:
+ *                   type: integer
+ *                   description: Código do produto
+ *                 sku:
+ *                   type: string
+ *                   description: Código SKU do produto
+ *                 Descricao:
+ *                   type: string
+ *                   description: Descrição do produto
+ *                 Altura:
+ *                   type: number
+ *                   description: Altura do produto
+ *                 Largura:
+ *                   type: number
+ *                   description: Largura do produto
+ *                 Comprimento:
+ *                   type: number
+ *                   description: Comprimento do produto
+ *                 Peso:
+ *                   type: number
+ *                   description: Peso bruto do produto
+ *                 Barras:
+ *                   type: string
+ *                   description: Código de barras do produto
+ *                 N:
+ *                   type: string
+ *                   description: Unidade de medida do produto
+ *                 PASTA:
+ *                   type: string
+ *                   description: Nome da pasta associada ao produto
+ *                 GTINS:
+ *                   type: array
+ *                   description: Lista de informações das embalagens relacionadas ao produto
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       EMBALAGEM:
+ *                         type: string
+ *                         description: Nome da embalagem
+ *                       GTIN:
+ *                         type: string
+ *                         description: Código GTIN da embalagem
+ *                       QUANTIDADE:
+ *                         type: number
+ *                         description: Quantidade de produtos na embalagem
+ *                       UNIDADE:
+ *                         type: string
+ *                         description: Unidade de medida da embalagem
+ *                       PADRAO:
+ *                         type: boolean
+ *                         description: Indica se a embalagem é a padrão
+ *       400:
+ *         description: Parâmetro obrigatório 'produto' não fornecido
+ *       500:
+ *         description: Erro ao buscar dados do produto
+ */
+
 router.get("/", login.required, produtosController.getProdutoData);
 router.get("/comparar", login.required, produtosController.compararProdutos);
-
 router.get("/:produto", login.required, produtosController.getProdutoDataById);
+router.get(
+  "/codigo/:produto",
+  login.required,
+  produtosController.getProdutoDataByCode
+);
 
 module.exports = router;
