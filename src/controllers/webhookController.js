@@ -34,7 +34,6 @@ exports.webhookVendas = async (req, res) => {
       volumePROPOSTA: Volumes,
     });
 
-    console.log({ createRetornoProposta });
 
     if (!createRetornoProposta) {
       return res.status(500).json({ erro: "Erro ao criar a proposta." });
@@ -60,8 +59,6 @@ exports.webhookVendas = async (req, res) => {
           loteITEMPROPOSTA: nomeLote,
           nomeloteITEMPROPOSTA: nomeLote,
         });
-
-        console.log(createRetornoItem);
 
         if (!createRetornoItem) {
           return res
@@ -94,7 +91,7 @@ exports.webhookVendas = async (req, res) => {
       }
     );
 
-    console.log("Procedure: ", execProcedure);
+    // console.log("Procedure: ", execProcedure);
 
     return res.status(201).json({ ok: "OK" });
   } catch (error) {
@@ -150,7 +147,7 @@ exports.webhookCompras = async (req, res) => {
 
 exports.webhookOP = async (req, res) => {
   try {
-    const { op, quantidadeColetada, wms, volume, peso } = req.body;
+    const { op, quantidadeColetada, wms } = req.body;
 
     const usuario = await this.getUserByToken(req);
 
@@ -164,28 +161,33 @@ exports.webhookOP = async (req, res) => {
       parseFloat(quantidadeColetada);
 
     if (wms === 2) {
+      
       try {
         const encerrarOP = await sqlServerSequelize.query(
-          "EXEC sps1301_EncerrarProducao_wms @OP = :op, @CustoProducao = 0, @QuantidadeFinalOP = :quantidadeColetada, @Resultado = '' ",
+          "EXEC sps1301_EncerrarProducao_wms @OP = :op, @CustoProducao = 0, @QuantidadeFinalOP = :quantidadeColetada, @wms = :wms, @Resultado = '' ",
           {
-            replacements: { op, quantidadeColetada },
+            replacements: { op, quantidadeColetada, wms },
             type: QueryTypes.SELECT,
             raw: true,
           }
         );
+
+/*   const updatedRows = await Producao.update(
+        { wmsPRODUCAO: wms, statusPRODUCAO: 3 },
+        { where: { codigoPRODUCAO: op } }
+      );
+ */
+      return res
+        .status(201)
+        .json({ message: "OP encerrada com sucesso!" });
+
+
       } catch (error) {
         console.log(error);
         return res.status(500).send(error);
       }
 
-      const updatedRows = await Producao.update(
-        { wmsPRODUCAO: wms, statusPRODUCAO: 3 },
-        { where: { codigoPRODUCAO: op } }
-      );
-
-      return res
-        .status(201)
-        .json({ updatedRows, message: "OP encerrada com sucesso!" });
+    
     }
 
     if (wms === 3) {
@@ -251,7 +253,7 @@ exports.webhookOP = async (req, res) => {
         const updatedRows = await Producao.update(
           {
             wmsPRODUCAO: wms,
-            pastaPRODUCAO: 4593,
+            pastaPRODUCAO: 4675,
           },
           { where: { codigoProducao: op } }
         );
