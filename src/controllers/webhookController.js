@@ -72,7 +72,6 @@ exports.webhookVendas = async (req, res) => {
           quantidadeLOTEITEM: quantidadeLote,
         });
 
-        console.log(createLoteItem);
 
         if (!createLoteItem) {
           return res.status(500).json({
