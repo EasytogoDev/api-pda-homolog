@@ -108,23 +108,44 @@ exports.findAll = async (req, res) => {
 
   try {
     const propostas = await Propostas.findAll({
-      where: wms ? { prop8PROPOSTA: wms } : {},
+      where: {
+        ...(wms && { prop8PROPOSTA: wms }), // Adiciona a condição apenas se wms existir
+        statusPROPOSTA: 1,
+      },
       limit: limit ? parseInt(limit, 10) : undefined, // Limitando o número de registros
       offset: offset ? parseInt(offset, 10) : undefined, // Definindo o ponto de partida
     });
 
-    const propostasAjustadas = propostas.map((proposta) => {
-      const novaProposta = {};
-      Object.keys(proposta.dataValues).forEach((key) => {
-        const chaveAjustada = key.replace("PROPOSTA", "");
-        novaProposta[chaveAjustada] = proposta[key];
-      });
+    const propostasAjustadas = await Promise.all(
+      propostas.map(async (proposta) => {
+        const novaProposta = {};
+        Object.keys(proposta.dataValues).forEach((key) => {
+          const chaveAjustada = key.replace("PROPOSTA", "");
+          novaProposta[chaveAjustada] = proposta[key];
+        });
 
-      novaProposta.wms = novaProposta.prop8;
-      delete novaProposta.prop8;
+        novaProposta.wms = novaProposta.prop8;
+        delete novaProposta.prop8;
 
-      return novaProposta;
-    });
+        // Adicionando a contagem de SKUs (itens únicos na proposta)
+        const quantidadeTotalSKU = await ItensProposta.count({
+          where: { propostaITEMPROPOSTA: proposta.codigoPROPOSTA },
+        });
+
+        // Adicionando a soma da quantidade total de itens na proposta
+        const quantidadeTotalItens = await ItensProposta.sum(
+          "quantidadeITEMPROPOSTA",
+          {
+            where: { propostaITEMPROPOSTA: proposta.codigoPROPOSTA },
+          }
+        );
+
+        novaProposta.quantidadeTotalSKU = quantidadeTotalSKU;
+        novaProposta.quantidadeTotalItens = quantidadeTotalItens;
+
+        return novaProposta;
+      })
+    );
 
     res.status(200).json({ status: true, propostas: propostasAjustadas });
   } catch (error) {
@@ -154,9 +175,12 @@ exports.findOne = async (req, res) => {
       where: { propostaITEMPROPOSTA: id },
     });
 
-    const quantidadeTotalItens = await ItensProposta.sum('quantidadeITEMPROPOSTA',{
-      where: { propostaITEMPROPOSTA: id },
-    });
+    const quantidadeTotalItens = await ItensProposta.sum(
+      "quantidadeITEMPROPOSTA",
+      {
+        where: { propostaITEMPROPOSTA: id },
+      }
+    );
 
     res.status(200).json({
       status: true,

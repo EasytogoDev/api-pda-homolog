@@ -95,14 +95,14 @@ exports.webhookVendas = async (req, res) => {
       }
     }
 
-    // const execProcedure = await sqlServerSequelize.query(
-    //   "EXEC spr1601_Retorno_Wms @PROPOSTA = :proposta, @USUARIO = :usuario",
-    //   {
-    //     replacements: { proposta, usuario },
-    //     type: QueryTypes.SELECT,
-    //     raw: true,
-    //   }
-    // );
+    const execProcedure = await sqlServerSequelize.query(
+      "EXEC spr1601_Retorno_Wms @PROPOSTA = :proposta, @USUARIO = :usuario",
+      {
+        replacements: { proposta, usuario },
+        type: QueryTypes.SELECT,
+        raw: true,
+      }
+    );
 
     if (quantidadeTotalSKU != itens.length) {
       await Historico1604.create({
@@ -292,3 +292,22 @@ exports.webhookOP = async (req, res) => {
     return res.status(500).json({ "Erro no webhook:": error.message });
   }
 };
+
+
+exports.webhookDivergencia = async(req,res) => {
+    const {proposta, quantidadeSKUDivergente, quantidadeItensDivergente } = req.body
+  try {
+    
+    const body = {
+      proposta,
+      quantidadeSKUDivergente,
+      quantidadeItensDivergente
+    }
+
+    const resposta = body
+
+    return res.send(resposta)
+  } catch (error) {
+    return res.status(500).send(error)
+  }
+}
