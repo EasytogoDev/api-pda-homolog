@@ -5,10 +5,12 @@ const {
   LogItemOrdemProducao,
   Temp1602LoteItensWms,
   Temp1202NFItensWms,
+  Historico1604,
 } = require("../models");
 const { sqlServerSequelize, sqlServerKnex } = require("../config/sqlserver");
 const { QueryTypes } = require("sequelize");
 const jwt = require("jsonwebtoken");
+const { now } = require("sequelize/lib/utils");
 
 exports.getUserByToken = async (req) => {
   const token = req.headers["authorization"];
@@ -21,7 +23,16 @@ exports.getUserByToken = async (req) => {
 
 exports.webhookVendas = async (req, res) => {
   try {
-    const { proposta, statuswms, usuario, itens, Volumes, PesoTotalPedido } = req.body;
+    const {
+      proposta,
+      statuswms,
+      usuario,
+      itens,
+      Volumes,
+      PesoTotalPedido,
+      quantidadeTotalSKU,
+      quantidadeTotalItens,
+    } = req.body;
 
     console.log("-----WEBHOOK VENDAS");
     console.log(req.body);
@@ -34,13 +45,14 @@ exports.webhookVendas = async (req, res) => {
       volumePROPOSTA: Volumes,
     });
 
-
     if (!createRetornoProposta) {
       return res.status(500).json({ erro: "Erro ao criar a proposta." });
     }
 
+    var totalItens = 0;
+
     for (const item of itens) {
-      const { produtoItem, statusItem, lotes } = item;
+      const { produtoItem, statusItem, lotes, codigoItem } = item;
 
       for (const lote of lotes) {
         const { lote: nomeLote, quantidadeItem: quantidadeLote } = lote;
@@ -50,7 +62,10 @@ exports.webhookVendas = async (req, res) => {
           0
         );
 
+        totalItens += totalQuantidadeLotes;
+//TIRAR AUTO INCREMENT DA TABELA DE TEMP ITENS
         const createRetornoItem = await Temp1602RetornoItensWms.create({
+          codigoITEMPROPOSTA: codigoItem,
           produtoITEMPROPOSTA: produtoItem,
           propostaITEMPROPOSTA: proposta,
           quantidadeITEMPROPOSTA: totalQuantidadeLotes, // Soma dos lotes
@@ -72,7 +87,6 @@ exports.webhookVendas = async (req, res) => {
           quantidadeLOTEITEM: quantidadeLote,
         });
 
-
         if (!createLoteItem) {
           return res.status(500).json({
             erro: "Erro ao criar os lotes dos itens da proposta.",
@@ -81,18 +95,36 @@ exports.webhookVendas = async (req, res) => {
       }
     }
 
-    const execProcedure = await sqlServerSequelize.query(
-      "EXEC spr1601_Retorno_Wms @PROPOSTA = :proposta, @USUARIO = :usuario",
-      {
-        replacements: { proposta, usuario },
-        type: QueryTypes.SELECT,
-        raw: true,
-      }
-    );
+    // const execProcedure = await sqlServerSequelize.query(
+    //   "EXEC spr1601_Retorno_Wms @PROPOSTA = :proposta, @USUARIO = :usuario",
+    //   {
+    //     replacements: { proposta, usuario },
+    //     type: QueryTypes.SELECT,
+    //     raw: true,
+    //   }
+    // );
 
-    // console.log("Procedure: ", execProcedure);
-
-    return res.status(201).json({ ok: "OK" });
+    if (quantidadeTotalSKU != itens.length) {
+      await Historico1604.create({
+        documentoHISTORICO: proposta,
+        entidadeHISTORICO: 1601,
+        dataHISTORICO: Date(now()),
+        usuarioHISTORICO: 428,
+        descricaoHISTORICO: "Quantidade total de SKU divergentes",
+        sistemaHISTORICO: 1,
+      });
+    } else if (totalItens != quantidadeTotalItens) {
+      await Historico1604.create({
+        documentoHISTORICO: proposta,
+        entidadeHISTORICO: 1601,
+        dataHISTORICO: Date(now()),
+        usuarioHISTORICO: 428,
+        descricaoHISTORICO: "Quantidade total de itens divergentes.",
+        sistemaHISTORICO: 1,
+      });
+    } else {
+      return res.status(201).json({ ok: "OK" });
+    }
   } catch (error) {
     console.error("Erro no webhook:", error);
     return res.status(500).json({ "Erro no webhook:": error.message });
@@ -160,7 +192,6 @@ exports.webhookOP = async (req, res) => {
       parseFloat(quantidadeColetada);
 
     if (wms === 2) {
-      
       try {
         const encerrarOP = await sqlServerSequelize.query(
           "EXEC sps1301_EncerrarProducao_wms @OP = :op, @CustoProducao = 0, @QuantidadeFinalOP = :quantidadeColetada, @wms = :wms, @Resultado = '' ",
@@ -171,22 +202,16 @@ exports.webhookOP = async (req, res) => {
           }
         );
 
-/*   const updatedRows = await Producao.update(
+        /*   const updatedRows = await Producao.update(
         { wmsPRODUCAO: wms, statusPRODUCAO: 3 },
         { where: { codigoPRODUCAO: op } }
       );
  */
-      return res
-        .status(201)
-        .json({ message: "OP encerrada com sucesso!" });
-
-
+        return res.status(201).json({ message: "OP encerrada com sucesso!" });
       } catch (error) {
         console.log(error);
         return res.status(500).send(error);
       }
-
-    
     }
 
     if (wms === 3) {

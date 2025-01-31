@@ -18,8 +18,6 @@ exports.create = async (req, res) => {
   }
 };
 
-
-
 // Buscar um item de proposta por ID
 exports.findOne = async (req, res) => {
   const { id } = req.params;
@@ -27,8 +25,7 @@ exports.findOne = async (req, res) => {
     const itemProposta = await ItensProposta.findAll({
       where: {
         propostaITEMPROPOSTA: id,
-        statusITEMPROPOSTA: 3
-      }
+      },
     });
     if (!itemProposta) {
       return res

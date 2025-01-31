@@ -1,5 +1,10 @@
 const { sqlServerKnex } = require("../config/sqlserver");
-const { sqlServerSequelize, Vendedores, Propostas } = require("../models");
+const {
+  sqlServerSequelize,
+  Vendedores,
+  Propostas,
+  ItensProposta,
+} = require("../models");
 const jwt = require("jsonwebtoken");
 
 async function userIsSeller(req) {
@@ -131,18 +136,34 @@ exports.findAll = async (req, res) => {
   }
 };
 
-
 // Buscar uma proposta por ID
 exports.findOne = async (req, res) => {
   const { id } = req.params;
   try {
-    const proposta = await Propostas.findByPk(id);
+    const proposta = await Propostas.findOne({
+      where: { codigoPROPOSTA: id },
+    });
+
     if (!proposta) {
       return res
         .status(404)
         .json({ status: false, message: "Proposta não encontrada" });
     }
-    res.status(200).json({ status: true, proposta });
+
+    const quantidadeTotalSKU = await ItensProposta.count({
+      where: { propostaITEMPROPOSTA: id },
+    });
+
+    const quantidadeTotalItens = await ItensProposta.sum('quantidadeITEMPROPOSTA',{
+      where: { propostaITEMPROPOSTA: id },
+    });
+
+    res.status(200).json({
+      status: true,
+      proposta,
+      quantidadeTotalSKU,
+      quantidadeTotalItens,
+    });
   } catch (error) {
     res.status(500).json({
       status: false,

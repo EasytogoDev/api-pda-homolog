@@ -16,7 +16,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: `https://apisistema.gruporainha.com.br`,
+        url: `https://apisistema.rainhadassete.com.br`,
       },
     ],
     components: {

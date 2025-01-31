@@ -20,6 +20,8 @@ const Producao = require("./producao");
 const LogItemOrdemProducao = require("./historicoProducao");
 const Temp1602LoteItensWms = require("./temp_lote_items");
 const Temp1202NFItensWms = require("./temp_nf_item");
+const ItensProposta = require("./itenspropostas");
+const Historico1604 =  require("./1604historicos")
 
 Empresa.hasMany(Endereco, {
   foreignKey: "empresaENDERECO",
@@ -132,6 +134,16 @@ ItemNFe.belongsTo(CabecalhoNFe, {
   as: "CabecalhoNFe",
 });
 
+Propostas.hasMany(ItensProposta, {
+  foreignKey: "propostaITEMPROPOSTA",
+  as: "ItensProposta",
+});
+
+ItensProposta.belongsTo(Propostas, {
+  foreignKey: "propostaITEMPROPOSTA",
+  as: "Propostas",
+});
+
 module.exports = {
   sqlServerSequelize,
   Usuarios,
@@ -155,4 +167,6 @@ module.exports = {
   LogItemOrdemProducao,
   Temp1602LoteItensWms,
   Temp1202NFItensWms,
+  ItensProposta,
+  Historico1604
 };
