@@ -104,27 +104,27 @@ exports.webhookVendas = async (req, res) => {
       }
     );
 
-    if (quantidadeTotalSKU != itens.length) {
-      await Historico1604.create({
-        documentoHISTORICO: proposta,
-        entidadeHISTORICO: 1601,
-        dataHISTORICO: Date(now()),
-        usuarioHISTORICO: 428,
-        descricaoHISTORICO: "Quantidade total de SKU divergentes",
-        sistemaHISTORICO: 1,
-      });
-    } else if (totalItens != quantidadeTotalItens) {
-      await Historico1604.create({
-        documentoHISTORICO: proposta,
-        entidadeHISTORICO: 1601,
-        dataHISTORICO: Date(now()),
-        usuarioHISTORICO: 428,
-        descricaoHISTORICO: "Quantidade total de itens divergentes.",
-        sistemaHISTORICO: 1,
-      });
-    } else {
+    // if (quantidadeTotalSKU != itens.length) {
+    //   await Historico1604.create({
+    //     documentoHISTORICO: proposta,
+    //     entidadeHISTORICO: 1601,
+    //     dataHISTORICO: Date(now()),
+    //     usuarioHISTORICO: 428,
+    //     descricaoHISTORICO: "Quantidade total de SKU divergentes",
+    //     sistemaHISTORICO: 1,
+    //   });
+    // } else if (totalItens != quantidadeTotalItens) {
+    //   await Historico1604.create({
+    //     documentoHISTORICO: proposta,
+    //     entidadeHISTORICO: 1601,
+    //     dataHISTORICO: Date(now()),
+    //     usuarioHISTORICO: 428,
+    //     descricaoHISTORICO: "Quantidade total de itens divergentes.",
+    //     sistemaHISTORICO: 1,
+    //   });
+    // } else {
+      // }
       return res.status(201).json({ ok: "OK" });
-    }
   } catch (error) {
     console.error("Erro no webhook:", error);
     return res.status(500).json({ "Erro no webhook:": error.message });
