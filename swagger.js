@@ -10,13 +10,13 @@ const swaggerOptions = {
   swaggerDefinition: {
     openapi: "3.0.0",
     info: {
-      title: "API RAINHA DAS SETE - PDA (DEV)",
+      title: "API RAINHA DAS SETE - PDA (PROD)",
       version: "1.0.0",
       description: "Sistema ERP Interno",
     },
     servers: [
       {
-        url: `http://itatiba.rainhadassete.com.br:8095`,
+        url: `https://apisistema.rainhadassete.com.br`,
       },
     ],
     components: {
