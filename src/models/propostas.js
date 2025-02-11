@@ -313,6 +313,10 @@ const Propostas = sqlServerSequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    prop11PROPOSTA: {
+      type: DataTypes.DECIMAL(18, 0),
+      allowNull: true
+    }
   },
   {
     tableName: "tb1601_Propostas",

@@ -7,7 +7,7 @@ const login = require("../middleware/login");
  * @swagger
  * tags:
  *   name: Webhook
- *   description: Endpoints para processamento de vendas, compras e OP
+ *   description: Endpoints para processamento de vendas, compras, OP e divergências.
  */
 
 /**
@@ -15,7 +15,7 @@ const login = require("../middleware/login");
  * /api/retorno/vendas:
  *   post:
  *     summary: Processa uma proposta de vendas e seus itens
- *     description: Recebe informações de uma proposta de vendas, seus itens e os lotes associados, cria registros temporários no banco de dados e executa uma procedure no SQL Server.
+ *     description: Recebe informações de uma proposta de vendas, seus itens e os lotes associados, cria registros temporários no banco de dados e executa uma procedure no SQL Server. Retorna divergências, se houver.
  *     tags: [Webhook]
  *     security:
  *       - bearerAuth: []
@@ -32,6 +32,8 @@ const login = require("../middleware/login");
  *               - itens
  *               - Volumes
  *               - PesoTotalPedido
+ *               - quantidadeTotalSKU
+ *               - quantidadeTotalItens
  *             properties:
  *               proposta:
  *                 type: integer
@@ -54,6 +56,7 @@ const login = require("../middleware/login");
  *                     - produtoItem
  *                     - statusItem
  *                     - lotes
+ *                     - codigoItem
  *                   properties:
  *                     produtoItem:
  *                       type: integer
@@ -62,6 +65,10 @@ const login = require("../middleware/login");
  *                     statusItem:
  *                       type: integer
  *                       description: Status do item no WMS.
+ *                       example: 1
+ *                     codigoItem:
+ *                       type: integer
+ *                       description: Código do item.
  *                       example: 1
  *                     lotes:
  *                       type: array
@@ -88,6 +95,14 @@ const login = require("../middleware/login");
  *                 type: number
  *                 description: Peso total da proposta.
  *                 example: 20.3
+ *               quantidadeTotalSKU:
+ *                 type: integer
+ *                 description: Quantidade total de SKUs na proposta.
+ *                 example: 5
+ *               quantidadeTotalItens:
+ *                 type: integer
+ *                 description: Quantidade total de itens na proposta.
+ *                 example: 10
  *     responses:
  *       201:
  *         description: Proposta processada com sucesso.
@@ -98,7 +113,8 @@ const login = require("../middleware/login");
  *               properties:
  *                 ok:
  *                   type: string
- *                   example: "OK"
+ *                   description: Mensagem de sucesso ou divergência.
+ *                   example: "Proposta recebida sem divergências"
  *       500:
  *         description: Erro interno do servidor.
  *         content:
@@ -151,7 +167,6 @@ router.post("/vendas", login.required, webhookController.webhookVendas);
  *                     - numeroItem
  *                     - sku
  *                     - quantidade
- *                     - wms
  *                   properties:
  *                     item:
  *                       type: integer
@@ -169,10 +184,6 @@ router.post("/vendas", login.required, webhookController.webhookVendas);
  *                       type: integer
  *                       description: Quantidade do item na compra.
  *                       example: 10
- *                     wms:
- *                       type: integer
- *                       description: Status do item no WMS.
- *                       example: 2
  *     responses:
  *       201:
  *         description: Pedido processado com sucesso.
@@ -181,38 +192,9 @@ router.post("/vendas", login.required, webhookController.webhookVendas);
  *             schema:
  *               type: object
  *               properties:
- *                 result:
- *                   type: object
- *                   description: Resultado do processamento.
- *                   properties:
- *                     chaveNF:
- *                       type: string
- *                       example: "35190712345678901234550010000000011000000000"
- *                     wms:
- *                       type: integer
- *                       example: 2
- *                     itens:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           item:
- *                             type: integer
- *                             example: 101
- *                           numeroItem:
- *                             type: integer
- *                             example: 1
- *                           sku:
- *                             type: string
- *                             example: "SKU123456"
- *                           quantidade:
- *                             type: integer
- *                             example: 10
- *                           wms:
- *                             type: integer
- *                             example: 2
  *                 message:
  *                   type: string
+ *                   description: Mensagem de sucesso ou divergência.
  *                   example: "Compra encerrada está ok!"
  *       500:
  *         description: Erro interno do servidor.
@@ -261,19 +243,17 @@ router.post("/compras", login.required, webhookController.webhookCompras);
  *                 description: Status do WMS.
  *                 example: 3
  *     responses:
- *       200:
+ *       201:
  *         description: OP processada com sucesso.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 mensagem:
+ *                 message:
  *                   type: string
- *                   example: "Produção encerrada"
- *                 updatedRows:
- *                   type: integer
- *                   example: 1
+ *                   description: Mensagem de sucesso.
+ *                   example: "OP encerrada com sucesso!"
  *       500:
  *         description: Erro interno do servidor.
  *         content:
@@ -285,6 +265,70 @@ router.post("/compras", login.required, webhookController.webhookCompras);
  *                   type: string
  *                   example: "Erro ao processar a OP."
  */
+
 router.post("/op", login.required, webhookController.webhookOP);
+
+/**
+ * @swagger
+ * /api/retorno/divergencia:
+ *   post:
+ *     summary: Processa divergências em uma proposta
+ *     description: Recebe informações sobre divergências em uma proposta e retorna os dados recebidos.
+ *     tags: [Webhook]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - proposta
+ *               - quantidadeSKUDivergente
+ *               - quantidadeItensDivergente
+ *             properties:
+ *               proposta:
+ *                 type: integer
+ *                 description: Código da proposta.
+ *                 example: 12345
+ *               quantidadeSKUDivergente:
+ *                 type: integer
+ *                 description: Quantidade de SKUs divergentes.
+ *                 example: 2
+ *               quantidadeItensDivergente:
+ *                 type: integer
+ *                 description: Quantidade de itens divergentes.
+ *                 example: 5
+ *     responses:
+ *       200:
+ *         description: Divergências processadas com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 proposta:
+ *                   type: integer
+ *                   example: 12345
+ *                 quantidadeSKUDivergente:
+ *                   type: integer
+ *                   example: 2
+ *                 quantidadeItensDivergente:
+ *                   type: integer
+ *                   example: 5
+ *       500:
+ *         description: Erro interno do servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 erro:
+ *                   type: string
+ *                   example: "Erro ao processar divergências."
+ */
+
+router.post("/divergencia", login.required, webhookController.webhookDivergencia);
 
 module.exports = router;

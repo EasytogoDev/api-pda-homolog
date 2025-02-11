@@ -6,11 +6,13 @@ const {
   Temp1602LoteItensWms,
   Temp1202NFItensWms,
   Historico1604,
+  Propostas,
 } = require("../models");
 const { sqlServerSequelize, sqlServerKnex } = require("../config/sqlserver");
-const { QueryTypes } = require("sequelize");
+const { QueryTypes, where } = require("sequelize");
 const jwt = require("jsonwebtoken");
 const { now } = require("sequelize/lib/utils");
+const moment = require("moment");
 
 exports.getUserByToken = async (req) => {
   const token = req.headers["authorization"];
@@ -20,6 +22,17 @@ exports.getUserByToken = async (req) => {
 
   return usuario;
 };
+
+async function criarHistorico(proposta, descricao) {
+  await Historico1604.create({
+    documentoHISTORICO: proposta,
+    entidadeHISTORICO: 1601,
+    dataHISTORICO: moment().format("YYYY-MM-DD HH:mm:ss"), // Formato compatível com SQL Server
+    usuarioHISTORICO: 428,
+    descricaoHISTORICO: descricao,
+    sistemaHISTORICO: 1,
+  });
+}
 
 exports.webhookVendas = async (req, res) => {
   try {
@@ -36,6 +49,17 @@ exports.webhookVendas = async (req, res) => {
 
     console.log("-----WEBHOOK VENDAS");
     console.log(req.body);
+
+    if (statuswms == 5) {
+      const statusAtualizado = await Propostas.update(
+        { prop8PROPOSTA: statuswms },
+        { where: { codigoPROPOSTA: proposta } }
+      );
+      return res.send({
+        mensagem: "Proposta recebida e atualizada com o status 5",
+        statusAtualizado,
+      });
+    }
 
     const createRetornoProposta = await Temp1601RetornoWms.create({
       codigoPROPOSTA: proposta,
@@ -63,7 +87,7 @@ exports.webhookVendas = async (req, res) => {
         );
 
         totalItens += totalQuantidadeLotes;
-//TIRAR AUTO INCREMENT DA TABELA DE TEMP ITENS
+        //TIRAR AUTO INCREMENT DA TA  BELA DE TEMP ITENS
         const createRetornoItem = await Temp1602RetornoItensWms.create({
           codigoITEMPROPOSTA: codigoItem,
           produtoITEMPROPOSTA: produtoItem,
@@ -105,26 +129,20 @@ exports.webhookVendas = async (req, res) => {
     );
 
     // if (quantidadeTotalSKU != itens.length) {
-    //   await Historico1604.create({
-    //     documentoHISTORICO: proposta,
-    //     entidadeHISTORICO: 1601,
-    //     dataHISTORICO: Date(now()),
-    //     usuarioHISTORICO: 428,
-    //     descricaoHISTORICO: "Quantidade total de SKU divergentes",
-    //     sistemaHISTORICO: 1,
-    //   });
+    //   await criarHistorico(proposta, "Quantidade total de SKU divergentes");
+    //   return res
+    //     .status(201)
+    //     .json({ ok: "Proposta recebida com divergencia na quantidade de SKU" });
     // } else if (totalItens != quantidadeTotalItens) {
-    //   await Historico1604.create({
-    //     documentoHISTORICO: proposta,
-    //     entidadeHISTORICO: 1601,
-    //     dataHISTORICO: Date(now()),
-    //     usuarioHISTORICO: 428,
-    //     descricaoHISTORICO: "Quantidade total de itens divergentes.",
-    //     sistemaHISTORICO: 1,
+    //   await criarHistorico(proposta, "Quantidade total de itens divergentes.");
+    //   return res.status(201).json({
+    //     ok: "Proposta recebida com divergencia na quantidade total de itens",
     //   });
     // } else {
-      // }
-      return res.status(201).json({ ok: "OK" });
+    //   return res.status(201).json({ ok: "Proposta recebida sem divergências" });
+    // }
+
+    return res.status(201).json({ ok: "Proposta recebida e processada!" });
   } catch (error) {
     console.error("Erro no webhook:", error);
     return res.status(500).json({ "Erro no webhook:": error.message });
@@ -191,12 +209,43 @@ exports.webhookOP = async (req, res) => {
       parseFloat(quantidadeFinal.quantidadePRODUCAO) -
       parseFloat(quantidadeColetada);
 
+    const data = new Date();
+
+    // Adiciona 10 anos
+    data.setFullYear(data.getFullYear() + 10);
+
+    // Define hora, minuto, segundo e milissegundos específicos
+    data.setHours(0, 1, 0, 0);
+
+    // Formata a data no formato desejado: 'YYYY-MM-DD HH:MM:SS.SSS'
+    const formatData =
+      data.getFullYear() +
+      "-" +
+      String(data.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(data.getDate()).padStart(2, "0") +
+      " " +
+      String(data.getHours()).padStart(2, "0") +
+      ":" +
+      String(data.getMinutes()).padStart(2, "0") +
+      ":" +
+      String(data.getSeconds()).padStart(2, "0") +
+      "." +
+      String(data.getMilliseconds()).padStart(3, "0");
+
     if (wms === 2) {
       try {
         const encerrarOP = await sqlServerSequelize.query(
-          "EXEC sps1301_EncerrarProducao_wms @OP = :op, @CustoProducao = 0, @QuantidadeFinalOP = :quantidadeColetada, @wms = :wms, @Resultado = '' ",
+          `EXEC sps1301_EncerrarProducao_wms @OP = :op, 
+                                              @Usuario = 428, 
+                                              @IdentificacaoLoteOP = 'LT-${op}', 
+                                              @CertificadoLoteOP = "CQ-${op}", 
+                                              @ValidadeLoteOP= :formatData, 
+                                              @CustoProducao = 10, 
+                                              @QuantidadeFinalOP = :quantidadeColetada, 
+                                              @Resultado = '' `,
           {
-            replacements: { op, quantidadeColetada, wms },
+            replacements: { op, formatData, quantidadeColetada },
             type: QueryTypes.SELECT,
             raw: true,
           }
@@ -231,9 +280,16 @@ exports.webhookOP = async (req, res) => {
 
       try {
         const encerrarOP = await sqlServerSequelize.query(
-          "EXEC sps1301_EncerrarProducao_wms @OP = :op, @CustoProducao = 0, @QuantidadeFinalOP = :quantidadeColetada, @Resultado = '' ",
+          `EXEC sps1301_EncerrarProducao_wms  @OP = :op, 
+                                              @Usuario = 435, 
+                                              @IdentificacaoLoteOP = 'LT-${op}', 
+                                              @CertificadoLoteOP = "CQ-${op}", 
+                                              @ValidadeLoteOP= :formatData, 
+                                              @CustoProducao = 10, 
+                                              @QuantidadeFinalOP = :quantidadeColetada, 
+                                              @Resultado = '' `,
           {
-            replacements: { op, quantidadeColetada },
+            replacements: { op, formatData, quantidadeColetada },
             type: QueryTypes.SELECT,
             raw: true,
           }
@@ -293,21 +349,20 @@ exports.webhookOP = async (req, res) => {
   }
 };
 
-
-exports.webhookDivergencia = async(req,res) => {
-    const {proposta, quantidadeSKUDivergente, quantidadeItensDivergente } = req.body
+exports.webhookDivergencia = async (req, res) => {
+  const { proposta, quantidadeSKUDivergente, quantidadeItensDivergente } =
+    req.body;
   try {
-    
     const body = {
       proposta,
       quantidadeSKUDivergente,
-      quantidadeItensDivergente
-    }
+      quantidadeItensDivergente,
+    };
 
-    const resposta = body
+    const resposta = body;
 
-    return res.send(resposta)
+    return res.send(resposta);
   } catch (error) {
-    return res.status(500).send(error)
+    return res.status(500).send(error);
   }
-}
+};

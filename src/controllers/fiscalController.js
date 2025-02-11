@@ -70,7 +70,8 @@ exports.buscarNotaFiscalPorCodProposta = async (req, res) => {
       chaveNFE, 
       transportadoraNOTAFISCAL as TRANSPORTADORA, 
       numeroNOTAFISCAL, 
-      serieNOTAFISCAL
+      serieNOTAFISCAL, 
+      exportacaoCFOP AS EXPORTACAO
     FROM 
       tb1501_Notas_Fiscais
     INNER JOIN 
@@ -79,9 +80,15 @@ exports.buscarNotaFiscalPorCodProposta = async (req, res) => {
       tb1601_Propostas ON propostaITEMPROPOSTA = codigoPROPOSTA
     INNER JOIN 
       tb1522_NFe ON codigoNOTAFISCAL = nfNFE
-    WHERE 
-      codigoPROPOSTA = ?
+    INNER JOIN 
+      tb0511_Legislacoes ON codigoLEGISLACAO = legislacaoITEMPROPOSTA
+    INNER JOIN 
+      tb1503_CFOP ON cfopLEGISLACAO = codigoCFOP
+      WHERE 
+        codigoPROPOSTA = ?
+      --GROUP BY codigoNOTAFISCAL, codigoPROPOSTA, chaveNFE, transportadoraNOTAFISCAL, numeroNOTAFISCAL, serieNOTAFISCAL, exportacaoCFOP 
     `;
+
 
     const result = await sqlServerKnex.raw(query, [codigo]);
 

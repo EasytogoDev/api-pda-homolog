@@ -169,7 +169,7 @@ const login = require("../middleware/login"); // Middleware de autenticação
  *                     type: integer
  *                     description: Código da proposta.
  *                     example: 123
- *                   chaveacessoNOTAFISCAL:
+ *                   chaveNFE:
  *                     type: string
  *                     description: Chave de acesso da nota fiscal.
  *                     example: "35160608100049000128550010000007011030014867"
@@ -179,12 +179,16 @@ const login = require("../middleware/login"); // Middleware de autenticação
  *                     example: "Transportadora XYZ Ltda"
  *                   numeroNOTAFISCAL:
  *                     type: integer
- *                     description: Numero da nota fiscal
+ *                     description: Número da nota fiscal.
  *                     example: 001
  *                   serieNOTAFISCAL:
  *                     type: integer
- *                     description: Serie da nota fiscal
+ *                     description: Série da nota fiscal.
  *                     example: 2
+ *                   EXPORTACAO:
+ *                     type: string
+ *                     description: Informação sobre exportação.
+ *                     example: "Sim"
  *       '404':
  *         description: Código da proposta não encontrado.
  *       '500':

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const itensPropostaController = require("../controllers/itensPropostasController");
-const login = require("../middleware/login"); // Presumindo que você tenha um middleware de autenticação
+const login = require("../middleware/login"); // Middleware de autenticação
 
 /**
  * @swagger
@@ -27,74 +27,73 @@ const login = require("../middleware/login"); // Presumindo que você tenha um m
  *             properties:
  *               propostaITEMPROPOSTA:
  *                 type: integer
- *                 description: ID da proposta
+ *                 description: ID da proposta.
+ *                 example: 1001
  *               produtoITEMPROPOSTA:
  *                 type: integer
- *                 description: ID do produto
+ *                 description: ID do produto.
+ *                 example: 501
  *               quantidadeITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Quantidade do item
+ *                 description: Quantidade do item.
+ *                 example: 10
  *               valorITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Valor do item
+ *                 description: Valor do item.
+ *                 example: 150.00
  *               finalidadeITEMPROPOSTA:
  *                 type: integer
- *                 description: Finalidade do item
+ *                 description: Finalidade do item.
+ *                 example: 1
  *               statusITEMPROPOSTA:
  *                 type: integer
- *                 description: Status do item
+ *                 description: Status do item.
+ *                 example: 2
  *               brutoITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Valor bruto do item
+ *                 description: Valor bruto do item.
+ *                 example: 200.00
  *               liquidototalITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Valor líquido total do item
+ *                 description: Valor líquido total do item.
+ *                 example: 1500.00
  *               brutototalITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Valor bruto total do item
+ *                 description: Valor bruto total do item.
+ *                 example: 1800.00
  *               basecalculoicmsITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Base de cálculo ICMS do item
+ *                 description: Base de cálculo ICMS do item.
+ *                 example: 100.00
  *               basecalculoicmstotalITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Base de cálculo total ICMS do item
+ *                 description: Base de cálculo total ICMS do item.
+ *                 example: 200.00
  *               basecalculoicmsstITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Base de cálculo ICMS ST do item
+ *                 description: Base de cálculo ICMS ST do item.
+ *                 example: 150.00
  *               basecalculofcpsttotalITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Base de cálculo FCP ST total do item
+ *                 description: Base de cálculo FCP ST total do item.
+ *                 example: 50.00
  *               basecalculofcptotalITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Base de cálculo FCP total do item
- *             example:
- *               propostaITEMPROPOSTA: 1001
- *               produtoITEMPROPOSTA: 501
- *               quantidadeITEMPROPOSTA: 10
- *               valorITEMPROPOSTA: 150.00
- *               finalidadeITEMPROPOSTA: 1
- *               statusITEMPROPOSTA: 2
- *               brutoITEMPROPOSTA: 200.00
- *               liquidototalITEMPROPOSTA: 1500.00
- *               brutototalITEMPROPOSTA: 1800.00
- *               basecalculoicmsITEMPROPOSTA: 100.00
- *               basecalculoicmstotalITEMPROPOSTA: 200.00
- *               basecalculoicmsstITEMPROPOSTA: 150.00
- *               basecalculofcpsttotalITEMPROPOSTA: 50.00
- *               basecalculofcptotalITEMPROPOSTA: 75.00
+ *                 description: Base de cálculo FCP total do item.
+ *                 example: 75.00
  *     responses:
  *       201:
- *         description: Item de proposta criado com sucesso
+ *         description: Item de proposta criado com sucesso.
  *         content:
  *           application/json:
  *             schema:
@@ -109,22 +108,29 @@ const login = require("../middleware/login"); // Presumindo que você tenha um m
  *                 itemProposta:
  *                   type: object
  *       500:
- *         description: Erro ao criar item de proposta
+ *         description: Erro ao criar item de proposta.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 error:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
  *                   type: string
  *                   example: "Erro ao criar item de proposta"
+ *                 error:
+ *                   type: string
+ *                   example: "Mensagem de erro detalhada"
  */
 
 /**
  * @swagger
  * /api/itens-propostas/{id}:
  *   get:
- *     summary: Buscar um item de proposta por ID
+ *     summary: Buscar itens de proposta por ID da proposta
+ *     description: Retorna todos os itens de uma proposta com status 3.
  *     tags: [ItensProposta]
  *     security:
  *       - bearerAuth: []
@@ -134,67 +140,72 @@ const login = require("../middleware/login"); // Presumindo que você tenha um m
  *         schema:
  *           type: integer
  *         required: true
- *         description: ID do item de proposta
+ *         description: ID da proposta.
  *     responses:
  *       200:
- *         description: Dados do item de proposta encontrado
+ *         description: Itens de proposta encontrados.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 codigoITEMPROPOSTA:
- *                   type: integer
- *                 propostaITEMPROPOSTA:
- *                   type: integer
- *                 produtoITEMPROPOSTA:
- *                   type: integer
- *                 quantidadeITEMPROPOSTA:
- *                   type: number
- *                   format: decimal
- *                 valorITEMPROPOSTA:
- *                   type: number
- *                   format: decimal
- *                 brutoITEMPROPOSTA:
- *                   type: number
- *                   format: decimal
- *                 statusITEMPROPOSTA:
- *                   type: integer
- *                 basecalculoicmsITEMPROPOSTA:
- *                   type: number
- *                   format: decimal
- *                 basecalculoicmstotalITEMPROPOSTA:
- *                   type: number
- *                   format: decimal
- *                 basecalculoicmsstITEMPROPOSTA:
- *                   type: number
- *                   format: decimal
- *                 basecalculofcpsttotalITEMPROPOSTA:
- *                   type: number
- *                   format: decimal
- *                 basecalculofcptotalITEMPROPOSTA:
- *                   type: number
- *                   format: decimal
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 itemProposta:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       codigoITEMPROPOSTA:
+ *                         type: integer
+ *                         example: 1
+ *                       propostaITEMPROPOSTA:
+ *                         type: integer
+ *                         example: 1001
+ *                       produtoITEMPROPOSTA:
+ *                         type: integer
+ *                         example: 501
+ *                       quantidadeITEMPROPOSTA:
+ *                         type: number
+ *                         format: decimal
+ *                         example: 10
+ *                       valorITEMPROPOSTA:
+ *                         type: number
+ *                         format: decimal
+ *                         example: 150.00
+ *                       statusITEMPROPOSTA:
+ *                         type: integer
+ *                         example: 3
  *       404:
- *         description: Item de proposta não encontrado
+ *         description: Nenhum item de proposta encontrado.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
  *                 message:
  *                   type: string
  *                   example: "Item de proposta não encontrado"
  *       500:
- *         description: Erro ao buscar item de proposta
+ *         description: Erro ao buscar itens de proposta.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 error:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
  *                   type: string
  *                   example: "Erro ao buscar item de proposta"
+ *                 error:
+ *                   type: string
+ *                   example: "Mensagem de erro detalhada"
  */
 
 /**
@@ -211,7 +222,7 @@ const login = require("../middleware/login"); // Presumindo que você tenha um m
  *         schema:
  *           type: integer
  *         required: true
- *         description: ID do item de proposta
+ *         description: ID do item de proposta.
  *     requestBody:
  *       required: true
  *       content:
@@ -222,46 +233,60 @@ const login = require("../middleware/login"); // Presumindo que você tenha um m
  *               quantidadeITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Quantidade do item
+ *                 description: Quantidade do item.
+ *                 example: 15
  *               valorITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Valor do item
+ *                 description: Valor do item.
+ *                 example: 250.00
  *               statusITEMPROPOSTA:
  *                 type: integer
- *                 description: Status atualizado do item
+ *                 description: Status do item.
+ *                 example: 3
+ *               brutoITEMPROPOSTA:
+ *                 type: number
+ *                 format: decimal
+ *                 description: Valor bruto do item.
+ *                 example: 200.00
+ *               liquidototalITEMPROPOSTA:
+ *                 type: number
+ *                 format: decimal
+ *                 description: Valor líquido total do item.
+ *                 example: 1500.00
+ *               brutototalITEMPROPOSTA:
+ *                 type: number
+ *                 format: decimal
+ *                 description: Valor bruto total do item.
+ *                 example: 1800.00
  *               basecalculoicmsITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Base de cálculo ICMS do item
+ *                 description: Base de cálculo ICMS do item.
+ *                 example: 100.00
  *               basecalculoicmstotalITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Base de cálculo total ICMS do item
+ *                 description: Base de cálculo total ICMS do item.
+ *                 example: 200.00
  *               basecalculoicmsstITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Base de cálculo ICMS ST do item
+ *                 description: Base de cálculo ICMS ST do item.
+ *                 example: 150.00
  *               basecalculofcpsttotalITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Base de cálculo FCP ST total do item
+ *                 description: Base de cálculo FCP ST total do item.
+ *                 example: 50.00
  *               basecalculofcptotalITEMPROPOSTA:
  *                 type: number
  *                 format: decimal
- *                 description: Base de cálculo FCP total do item
- *             example:
- *               quantidadeITEMPROPOSTA: 15
- *               valorITEMPROPOSTA: 250.00
- *               statusITEMPROPOSTA: 3
- *               basecalculoicmsITEMPROPOSTA: 100.00
- *               basecalculoicmstotalITEMPROPOSTA: 200.00
- *               basecalculoicmsstITEMPROPOSTA: 150.00
- *               basecalculofcpsttotalITEMPROPOSTA: 50.00
- *               basecalculofcptotalITEMPROPOSTA: 75.00
+ *                 description: Base de cálculo FCP total do item.
+ *                 example: 75.00
  *     responses:
  *       200:
- *         description: Item de proposta atualizado com sucesso
+ *         description: Item de proposta atualizado com sucesso.
  *         content:
  *           application/json:
  *             schema:
@@ -276,25 +301,34 @@ const login = require("../middleware/login"); // Presumindo que você tenha um m
  *                 itemProposta:
  *                   type: object
  *       404:
- *         description: Item de proposta não encontrado
+ *         description: Item de proposta não encontrado.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
  *                 message:
  *                   type: string
  *                   example: "Item de proposta não encontrado"
  *       500:
- *         description: Erro ao atualizar item de proposta
+ *         description: Erro ao atualizar item de proposta.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 error:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
  *                   type: string
  *                   example: "Erro ao atualizar item de proposta"
+ *                 error:
+ *                   type: string
+ *                   example: "Mensagem de erro detalhada"
  */
 
 /**
@@ -311,10 +345,10 @@ const login = require("../middleware/login"); // Presumindo que você tenha um m
  *         schema:
  *           type: integer
  *         required: true
- *         description: ID do item de proposta
+ *         description: ID do item de proposta.
  *     responses:
  *       200:
- *         description: Item de proposta deletado com sucesso
+ *         description: Item de proposta deletado com sucesso.
  *         content:
  *           application/json:
  *             schema:
@@ -327,32 +361,40 @@ const login = require("../middleware/login"); // Presumindo que você tenha um m
  *                   type: string
  *                   example: "Item de proposta deletado com sucesso!"
  *       404:
- *         description: Item de proposta não encontrado
+ *         description: Item de proposta não encontrado.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
  *                 message:
  *                   type: string
  *                   example: "Item de proposta não encontrado"
  *       500:
- *         description: Erro ao deletar item de proposta
+ *         description: Erro ao deletar item de proposta.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 error:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
  *                   type: string
  *                   example: "Erro ao deletar item de proposta"
+ *                 error:
+ *                   type: string
+ *                   example: "Mensagem de erro detalhada"
  */
-
 
 // Criar um novo item de proposta
 router.post("/", login.required, itensPropostaController.create);
 
-// Buscar um item de proposta por ID
+// Buscar itens de proposta por ID da proposta
 router.get("/:id", login.required, itensPropostaController.findOne);
 
 // Atualizar um item de proposta por ID

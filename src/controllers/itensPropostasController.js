@@ -25,8 +25,14 @@ exports.findOne = async (req, res) => {
     const itemProposta = await ItensProposta.findAll({
       where: {
         propostaITEMPROPOSTA: id,
-        statusITEMPROPOSTA: 3
+        statusITEMPROPOSTA: 3,
       },
+      attributes: [
+        "codigoITEMPROPOSTA",
+        "propostaITEMPROPOSTA",
+        "produtoITEMPROPOSTA",
+        "quantidadeITEMPROPOSTA",
+      ],
     });
     if (!itemProposta) {
       return res
