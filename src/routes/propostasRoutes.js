@@ -25,18 +25,18 @@ const login = require("../middleware/login"); // Middleware de autenticação
  *           schema:
  *             type: object
  *             properties:
- *               clienteId:
+ *               clientePROPOSTA:
  *                 type: integer
  *                 description: ID do cliente
- *               valorTotal:
+ *               liquidoPROPOSTA:
  *                 type: number
- *                 description: Valor total da proposta
+ *                 description: Valor líquido da proposta
  *               descricao:
  *                 type: string
  *                 description: Descrição da proposta
  *             example:
- *               clienteId: 1
- *               valorTotal: 5000.00
+ *               clientePROPOSTA: 1
+ *               liquidoPROPOSTA: 5000.00
  *               descricao: "Proposta de serviços de TI"
  *     responses:
  *       201:
@@ -50,17 +50,11 @@ router.post("/create", login.required, propostasControllers.create);
  * @swagger
  * /api/propostas/all:
  *   get:
- *     summary: Buscar todas as propostas
+ *     summary: Buscar todas as propostas ativas
  *     tags: [Propostas]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: query
- *         name: wms
- *         schema:
- *           type: string
- *         required: false
- *         description: Filtro por código WMS
  *       - in: query
  *         name: limit
  *         schema:
@@ -75,7 +69,7 @@ router.post("/create", login.required, propostasControllers.create);
  *         description: Quantidade de registros a serem ignorados
  *     responses:
  *       200:
- *         description: Lista de propostas retornadas
+ *         description: Lista de propostas ativas retornadas
  *       500:
  *         description: Erro ao buscar propostas
  */
@@ -128,14 +122,14 @@ router.get("/get/:id", login.required, propostasControllers.findOne);
  *           schema:
  *             type: object
  *             properties:
- *               valorTotal:
+ *               liquidoPROPOSTA:
  *                 type: number
- *                 description: Novo valor total
+ *                 description: Novo valor líquido
  *               descricao:
  *                 type: string
  *                 description: Descrição atualizada
  *             example:
- *               valorTotal: 6000.00
+ *               liquidoPROPOSTA: 6000.00
  *               descricao: "Proposta atualizada"
  *     responses:
  *       200:
@@ -186,10 +180,6 @@ router.delete("/delete/:id", login.required, propostasControllers.delete);
  *       500:
  *         description: Erro no servidor
  */
-router.get(
-  "/grouped",
-  login.required,
-  propostasControllers.getPropostasGrouped
-);
+router.get("/grouped", login.required, propostasControllers.getPropostasGrouped);
 
 module.exports = router;
