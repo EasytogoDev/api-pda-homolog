@@ -21,7 +21,31 @@ const LogItemOrdemProducao = require("./historicoProducao");
 const Temp1602LoteItensWms = require("./temp_lote_items");
 const Temp1202NFItensWms = require("./temp_nf_item");
 const ItensProposta = require("./itenspropostas");
-const Historico1604 =  require("./1604historicos")
+const Historico1604 = require("./1604historicos");
+const Legislacoes = require("./legislacoes");
+const CFOP = require("./cfop");
+
+// Relacionamento ItensProposta → Legislacoes
+ItensProposta.belongsTo(Legislacoes, {
+  foreignKey: "legislacaoITEMPROPOSTA",
+  as: "legislacao",
+});
+
+Legislacoes.hasMany(ItensProposta, {
+  foreignKey: "legislacaoITEMPROPOSTA",
+  as: "itensProposta",
+});
+
+// Relacionamento Legislacoes → CFOP
+Legislacoes.belongsTo(CFOP, {
+  foreignKey: "cfopLEGISLACAO",
+  as: "cfop",
+});
+
+CFOP.hasMany(Legislacoes, {
+  foreignKey: "cfopLEGISLACAO",
+  as: "legislacoes",
+});
 
 Empresa.hasMany(Endereco, {
   foreignKey: "empresaENDERECO",
@@ -136,7 +160,7 @@ ItemNFe.belongsTo(CabecalhoNFe, {
 
 Propostas.hasMany(ItensProposta, {
   foreignKey: "propostaITEMPROPOSTA",
-  as: "ItensProposta",
+  as: "itensProposta",
 });
 
 ItensProposta.belongsTo(Propostas, {
@@ -168,5 +192,7 @@ module.exports = {
   Temp1602LoteItensWms,
   Temp1202NFItensWms,
   ItensProposta,
-  Historico1604
+  Historico1604,
+  Legislacoes,
+  CFOP,
 };
