@@ -4,8 +4,12 @@ const {
   Vendedores,
   Propostas,
   ItensProposta,
+  CFOP,
+  Legislacoes,
 } = require("../models");
 const jwt = require("jsonwebtoken");
+const Sequelize = require("sequelize");
+const Legislacao = require("../models/legislacoes");
 
 async function userIsSeller(req) {
   const token = req.headers["authorization"];
@@ -104,12 +108,13 @@ exports.create = async (req, res) => {
 
 // Buscar todas as propostas
 exports.findAll = async (req, res) => {
-  const { wms, limit, offset } = req.query; // Obtendo os parâmetros de consulta
+  const { limit, offset } = req.query; // Obtendo os parâmetros de consulta
 
   try {
     const propostas = await Propostas.findAll({
+      attributes: { exclude: [] },
       where: {
-        ...(wms && { prop8PROPOSTA: wms }), // Adiciona a condição apenas se wms existir
+        prop8PROPOSTA: 1, // Adiciona a condição apenas se wms existir
         statusPROPOSTA: 1,
       },
       limit: limit ? parseInt(limit, 10) : undefined, // Limitando o número de registros
@@ -125,18 +130,26 @@ exports.findAll = async (req, res) => {
         });
 
         novaProposta.wms = novaProposta.prop8;
+        novaProposta.exportacao = novaProposta.prop11;
         delete novaProposta.prop8;
+        delete novaProposta.prop11;
 
         // Adicionando a contagem de SKUs (itens únicos na proposta)
         const quantidadeTotalSKU = await ItensProposta.count({
-          where: { propostaITEMPROPOSTA: proposta.codigoPROPOSTA },
+          where: {
+            propostaITEMPROPOSTA: proposta.codigoPROPOSTA,
+            statusITEMPROPOSTA: 3,
+          },
         });
 
         // Adicionando a soma da quantidade total de itens na proposta
         const quantidadeTotalItens = await ItensProposta.sum(
           "quantidadeITEMPROPOSTA",
           {
-            where: { propostaITEMPROPOSTA: proposta.codigoPROPOSTA },
+            where: {
+              propostaITEMPROPOSTA: proposta.codigoPROPOSTA,
+              statusITEMPROPOSTA: 3,
+            },
           }
         );
 
@@ -172,19 +185,26 @@ exports.findOne = async (req, res) => {
     }
 
     const quantidadeTotalSKU = await ItensProposta.count({
-      where: { propostaITEMPROPOSTA: id },
+      where: { propostaITEMPROPOSTA: id, statusITEMPROPOSTA: 3 },
     });
 
     const quantidadeTotalItens = await ItensProposta.sum(
       "quantidadeITEMPROPOSTA",
       {
-        where: { propostaITEMPROPOSTA: id },
+        where: { propostaITEMPROPOSTA: id, statusITEMPROPOSTA: 3 },
       }
     );
 
+    // Criando um novo objeto com os dados da proposta
+    const propostaAjustada = { ...proposta.get() };
+
+    // Renomeando o campo prop11PROPOSTA para exportacao
+    propostaAjustada.exportacao = propostaAjustada.prop11PROPOSTA;
+    delete propostaAjustada.prop11PROPOSTA; // Removendo o campo original
+
     res.status(200).json({
       status: true,
-      proposta,
+      proposta: propostaAjustada,
       quantidadeTotalSKU,
       quantidadeTotalItens,
     });
