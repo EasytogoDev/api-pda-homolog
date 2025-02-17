@@ -16,7 +16,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: `http://itatiba.rainhadassete.com.br:8095`,
+        url: `https://apisistemahomolog.gruporainha.com.br`,
       },
       {
         url: `http://192.168.50.5:8095`,
