@@ -194,9 +194,26 @@ exports.webhookCompras = async (req, res) => {
   }
 };
 
+const verificaOPFoiEncerrada = async (op) => {
+  const buscaProducao = await Producao.findOne({
+    where: {
+      codigoPRODUCAO: op,
+    },
+  });
+
+  const statusProducao = buscaProducao.dataValues.statusPRODUCAO;
+
+  if (statusProducao == 3) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 exports.webhookOP = async (req, res) => {
   try {
     const { op, quantidadeColetada, wms } = req.body;
+    console.log(op, quantidadeColetada, wms)
 
     const usuario = await this.getUserByToken(req);
 
@@ -251,12 +268,13 @@ exports.webhookOP = async (req, res) => {
           }
         );
 
-        /*   const updatedRows = await Producao.update(
-        { wmsPRODUCAO: wms, statusPRODUCAO: 3 },
-        { where: { codigoPRODUCAO: op } }
-      );
- */
-        return res.status(201).json({ message: "OP encerrada com sucesso!" });
+        const statusProducao = await verificaOPFoiEncerrada(op);
+
+        if (statusProducao) {
+          return res.status(200).json({ message: "OP encerrada com sucesso!" });
+        } else {
+          return res.status(403).json({ message: "A OP não foi encerrada" });
+        }
       } catch (error) {
         console.log(error);
         return res.status(500).send(error);
@@ -281,7 +299,7 @@ exports.webhookOP = async (req, res) => {
       try {
         const encerrarOP = await sqlServerSequelize.query(
           `EXEC sps1301_EncerrarProducao_wms  @OP = :op, 
-                                              @Usuario = 435, 
+                                              @Usuario = 428, 
                                               @IdentificacaoLoteOP = 'LT-${op}', 
                                               @CertificadoLoteOP = "CQ-${op}", 
                                               @ValidadeLoteOP= :formatData, 
@@ -307,7 +325,7 @@ exports.webhookOP = async (req, res) => {
           },
           { where: { codigoProducao: op } }
         );
-        return res.status(201).json(updatedRows);
+        return res.status(200).json(updatedRows);
       } catch (error) {
         console.log(error);
         return res.status(500).send(error);
@@ -343,6 +361,36 @@ exports.webhookOP = async (req, res) => {
         return res.status(500).send(error);
       }
     }
+  } catch (error) {
+    console.error("Erro no webhook:", error);
+    return res.status(500).json({ "Erro no webhook:": error.message });
+  }
+};
+
+
+
+exports.webhookSEPARACAO = async (req, res) => {
+  try {
+    const { op, wms } = req.body;
+    console.log(op, wms)
+
+    const usuario = await this.getUserByToken(req);
+
+    
+      try {
+        const updatedRows = await Producao.update(
+          {
+            wmsPRODUCAO: wms,
+            pastaPRODUCAO: 2976,
+          },
+          { where: { codigoProducao: op } }
+        );
+        return res.status(201).json(updatedRows);
+      } catch (error) {
+        console.log(error);
+        return res.status(500).send(error);
+      }
+    
   } catch (error) {
     console.error("Erro no webhook:", error);
     return res.status(500).json({ "Erro no webhook:": error.message });

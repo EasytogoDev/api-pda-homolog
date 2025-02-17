@@ -331,4 +331,63 @@ router.post("/op", login.required, webhookController.webhookOP);
 
 router.post("/divergencia", login.required, webhookController.webhookDivergencia);
 
+
+/**
+ * @swagger
+ * /api/retorno/separacao:
+ *   post:
+ *     summary: Processa Ordens de Produção de Separação
+ *     description: Recebe Ordens de Separação ja separadas.
+ *     tags: [Webhook]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - op
+ *               - wms
+ *             properties:
+ *               op:
+ *                 type: integer
+ *                 description: Código da Ordem de Produção.
+ *                 example: 12345
+ *               wms:
+ *                 type: integer
+ *                 description: Retorno de status de Separação WMS.
+ *                 example: 2
+ *     responses:
+ *       200:
+ *         description: Divergências processadas com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 proposta:
+ *                   type: integer
+ *                   example: 12345
+ *                 quantidadeSKUDivergente:
+ *                   type: integer
+ *                   example: 2
+ *                 quantidadeItensDivergente:
+ *                   type: integer
+ *                   example: 5
+ *       500:
+ *         description: Erro interno do servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 erro:
+ *                   type: string
+ *                   example: "Erro ao processar divergências."
+ */
+
+router.post("/separacao", login.required, webhookController.webhookSEPARACAO);
+
 module.exports = router;

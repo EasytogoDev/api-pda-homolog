@@ -132,4 +132,100 @@ router.post(
   opsController.alterarStatusWMSPara1
 );
 
+
+/**
+ * @swagger
+ * /api/ops/separacao:
+ *   get:
+ *     summary: Obter dados de separação de produção
+ *     description: Retorna os dados de produção com os itens relacionados, suportando paginação e filtros opcionais.
+ *     tags:
+ *       - Produção
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Número máximo de registros a serem retornados.
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *         description: Número de registros a serem pulados antes de iniciar a listagem.
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: integer
+ *         description: Status da produção (1 = Gerada, 2 = Produzindo, 3 = Encerrada). Parâmetro opcional.
+ *       - in: query
+ *         name: wms
+ *         schema:
+ *           type: integer
+ *         description: Indicador WMS da produção. Parâmetro opcional.
+ *     responses:
+ *       '200':
+ *         description: Dados de separação retornados com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   OP:
+ *                     type: integer
+ *                     description: Código de produção.
+ *                     example: 12345
+ *                   SKU:
+ *                     type: string
+ *                     description: Código do produto (SKU).
+ *                     example: "ABC123"
+ *                   Quantidade:
+ *                     type: integer
+ *                     description: Quantidade a ser produzida.
+ *                     example: 100
+ *                   Empresa:
+ *                     type: string
+ *                     description: Nome da empresa.
+ *                     example: "Empresa XYZ"
+ *                   CodigoEmpresa:
+ *                     type: integer
+ *                     description: Código da empresa.
+ *                     example: 1
+ *                   CNPJ:
+ *                     type: string
+ *                     description: CNPJ da empresa.
+ *                     example: "00.000.000/0001-00"
+ *                   Itens:
+ *                     type: array
+ *                     description: Lista de itens pertencentes à OP.
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         codigoITEMOP:
+ *                           type: integer
+ *                           description: Código do item da OP.
+ *                           example: 1
+ *                         SKU:
+ *                           type: string
+ *                           description: Código do produto do item.
+ *                           example: "SUB123"
+ *                         Quantidade:
+ *                           type: integer
+ *                           description: Quantidade do item na OP.
+ *                           example: 10
+ *       '400':
+ *         description: Parâmetros inválidos fornecidos.
+ *       '500':
+ *         description: Erro interno do servidor.
+ */
+
+router.get(
+  "/separacao",
+  login.optional,
+  opsController.getSeparacao
+);
+
 module.exports = router;

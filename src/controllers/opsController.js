@@ -97,4 +97,71 @@ const alterarStatusWMSPara1 = async (req, res) => {
 };
 
 
-module.exports = { getProducaoData, alterarStatusWMSPara1 };
+
+const getSeparacao = async (req, res) => {
+  try {
+    const { limit = 10, offset = 0, status, wms } = req.query;
+
+    const baseQuery = `
+      SELECT 
+        prod.codigoPRODUCAO AS OP,
+        prodBase.partnumberPRODUTO AS SKU,
+        prod.quantidadePRODUCAO AS Quantidade, 
+        empresa.nomeEMPRESA AS Empresa,
+        empresa.codigoEMPRESA AS CodigoEmpresa,
+        empresa.cnpjEMPRESA AS CNPJ,
+        prod.separacaoPRODUCAO AS wms,
+        (
+            SELECT 
+                item.codigoITEMOP, 
+                prodItem.partnumberPRODUTO AS SKU,
+                item.quantidadeITEMOP AS Quantidade,
+                item.separacaoITEMOP AS wms
+            FROM tb1302_Itens_Ordem_Producao item
+            INNER JOIN tb0501_Produtos prodItem ON prodItem.codigoPRODUTO = item.produtoITEMOP
+            WHERE item.opITEMOP = prod.codigoPRODUCAO
+            FOR JSON PATH
+        ) AS Itens
+      FROM tb1301_Producao prod
+      INNER JOIN tb0501_Produtos prodBase ON prodBase.codigoPRODUTO = prod.produtoPRODUCAO
+      INNER JOIN tb0301_Empresas empresa ON empresa.codigoEMPRESA = prod.empresaPRODUCAO
+      WHERE prod.lixeiraPRODUCAO = 0 AND pastaPRODUCAO = 2981
+      ORDER BY prod.codigoPRODUCAO DESC
+      OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+      FOR JSON PATH;
+    `;
+
+    const queryParams = [Number(offset), Number(limit)];
+
+    const result = await sqlServerKnex.raw(baseQuery, queryParams);
+
+    // Verifica se o resultado é válido
+    console.log("Resultado do banco:", result);
+
+    if (!result || result.length === 0) {
+      return res.status(200).json({ Producoes: [] });
+    }
+
+    // Concatena todas as partes do JSON em uma única string
+    const jsonKey = Object.keys(result[0])[0]; // Pega a chave do JSON (ex: JSON_F52E2B61-...)
+    const rawJson = result.map(row => row[jsonKey]).join(""); // Junta todas as partes
+
+    if (!rawJson || typeof rawJson !== "string") {
+      console.error("Erro: Retorno do banco não é uma string JSON válida:", rawJson);
+      return res.status(500).json({ error: "Formato inválido retornado pelo banco." });
+    }
+
+    // Converte a string JSON para um objeto
+    const jsonData = JSON.parse(rawJson);
+
+    return res.status(200).json(jsonData);
+  } catch (error) {
+    console.error("Erro ao buscar dados de produção:", error);
+    return res.status(500).json({ error: "Erro ao buscar dados de produção." });
+  }
+};
+
+
+
+
+module.exports = { getProducaoData, alterarStatusWMSPara1, getSeparacao };
